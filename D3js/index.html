@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <aside class="sidebar">
+        <h3>Dashboard Menu</h3>
+    </aside>
+    <div class="main-content">
+        <header class="header">
+            <div class="dashboard-buttons">
+                <button class="menu-button">Menu</button>
+                <button class="dashboard-button">Dashboard 1</button>
+                <button class="dashboard-button">Dashboard 2</button>
+                <button class="dashboard-button">Dashboard 3</button>
+                <button class="dashboard-button">Dashboard 4</button>
+                <button class="dashboard-button">Dashboard 5</button>
+                <button class="dashboard-button">Dashboard 6</button>
+            </div>
+        </header>
+        <h1>Liczba ofert</h1>
+        <h2>Liczba ofert w ostatnim czasie</h2>
+        <section class="summary-container">
+            <div class ='weekly-data'>
+                <div class="summary-box">
+                    <div class="summary-box-text">Liczba ofert w ostatnim tygodniu:</div>
+                    <div class="summary-box-value">470</div>
+                </div>
+                <div class = 'ssss'>
+                    <div class="chart-container weekly-chart">
+                    </div>
+                </div>
+            </div>
+            <div class ='monthly-data'>
+                <div class="summary-box">Liczba ofert w ostatnim miesiącu: 
+                    <div><strong>1,840</strong></div>
+                </div>
+                <div class = 'ssss'>
+                    <div class="chart-container monthly-chart">Liczba ofert w ostatnim miesiącu: 1,840</div>
+                </div>
+            </div>
+            <div class ='alltime-data'>
+                <div class="summary-box">Liczba ofert w systemie:
+                    <div><strong>38,193</strong></div>
+                </div>
+                <div class = 'alltime-chart'>
+                    <div class="chart-container pie-chart">Rozkład ofert według poziomu doświadczenia (wykres)</div>
+                    <div class="chart-container metric-chart">Liczba ofert - poziomy (wykres)</div>
+                </div>
+            </div>
+        </section>
+        <h2>Liczba ofert na przestrzeni lat</h2>
+        <section class="ending-container">
+            <div class="chart-container line-chart">Rozkład ofert według poziomu doświadczenia (wykres)</div>
+        </section>
+    </div>
+<script src="script.js"></script>
+</body>
+</html>

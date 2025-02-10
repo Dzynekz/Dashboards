@@ -1,0 +1,43 @@
+'''
+.stMain {
+        background-color: rgb(255, 237, 216);
+    }
+    #zarobki-w-it {
+        color: black;
+    }
+    .stSidebar {
+        background-color: rgb(0, 119, 182);
+    }
+    .stAppHeader {
+        background-color: rgb(255, 237, 216);
+    }
+    .stMultiSelect {
+        
+    }
+    .stDateInput {
+
+    }
+'''
+
+
+
+
+'''
+    .configure(
+        background='rgb(248, 249, 250)'  # Tło wykresu #   
+    ).configure_legend(
+        titleColor='black',
+        labelColor='black'
+    ).configure_axis(
+        titleColor='black',
+        labelColor='black'
+    ).configure_header(
+        titleColor='black',
+        labelColor='black'
+    )
+
+    chart = chart.configure_title(
+        fontSize=20,
+        color='black'
+    )'''
+    
