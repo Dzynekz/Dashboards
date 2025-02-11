@@ -21,16 +21,120 @@ def main():
         <style>
         .main .block-container {
             max-width: 95%;
-            padding: 1rem;   
+            padding: 1rem;  
         }
         .stHeading {
-            margin: 1rem;
+            margin-bottom: 1rem;
+            margin-left: 5%;
+            margin-right: 5%;
         }
         .stMainBlockContainer {
             padding: 3rem;
+            
+        } 
+
+        div[data-testid="stHorizontalBlock"]:nth-child(5),
+         div[data-testid="stHorizontalBlock"]:nth-child(6),
+         div[data-testid="stHorizontalBlock"]:nth-child(8)
+           {
+            display: flex;
+            margin-left: 5%;
+            margin-right: 5%;
         }
-        .stColumn {
-            margin-bottom: 1rem;
+
+        
+        div[data-testid="stVerticalBlock"] > div[data-testid="stHorizontalBlock"]:nth-child(5) {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(5) > .stColumn:nth-child(1) {
+            min-width:30rem;      
+        }
+
+        div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(5) > .stColumn:nth-child(1) .stHorizontalBlock {
+            display: flex;
+            flex-direction: column;
+        
+        }
+        div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(5) > .stColumn:nth-child(1) .stHorizontalBlock > * {
+            width: 100%;
+        }
+        div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(5) > .stColumn:nth-child(1) .stHorizontalBlock .stColumn{
+            min-width:30rem;
+        }
+        div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(5) > .stColumn:nth-child(2) {
+            min-width:50rem;
+        }
+        div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(5) > .stColumn:nth-child(2) .stHorizontalBlock {
+            display: flex;
+        }
+        div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(5) > .stColumn:nth-child(2) .stHorizontalBlock .stColumn{
+            min-width:50rem;
+        }
+        div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(5) > .stColumn:nth-child(2) .stHorizontalBlock .stVerticalBlock{
+            display: flex;
+            flex-direction: row;
+        }
+        
+        
+
+
+        div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(8) {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            
+        }
+        div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(8) .stColumn:nth-child(1) .stHorizontalBlock {
+            display:flex;
+            flex-direction: column;
+        }
+        div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(8) > .stColumn:nth-child(1) .stHorizontalBlock > * {
+            width: 100%;
+        }
+        div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(8) .stColumn:nth-child(1) .stHorizontalBlock .stColumn:nth-child(1) .stVerticalBlock  {
+            display:flex;
+            flex-direction: row;
+        }
+        div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(8) .stColumn:nth-child(1) .stHorizontalBlock .stColumn:nth-child(1) .stVerticalBlock .stElementContainer {
+            min-width:10rem;
+        }
+        div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(8) > .stColumn:nth-child(1) {
+            min-width:40rem;
+        }
+        
+
+        div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(8) .stColumn:nth-child(2) .stHorizontalBlock {
+            display:flex;
+            flex-direction: column;
+            
+        }
+        div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(8) > .stColumn:nth-child(2) {
+            min-width:27rem;  
+            max-width:60%;    
+        }
+        
+        div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(8) .stColumn:nth-child(2) .stHorizontalBlock > * {
+            width: 100%;
+        }
+    
+         
+        
+
+        
+
+
+
+        div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(5) .stColumn:nth-child(1) .stColumn:nth-child(2),
+         div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(5) .stColumn:nth-child(1) .stColumn:nth-child(1),
+         div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(5) .stColumn:nth-child(2) .stColumn:nth-child(1) .stMetric,
+         div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(5) .stColumn:nth-child(2) .stColumn:nth-child(2),
+         div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(8) > .stColumn:nth-child(1) .stHorizontalBlock .stColumn:nth-child(2),
+         div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(8) .stColumn:nth-child(1) .stHorizontalBlock .stColumn:nth-child(1) .stVerticalBlock > *,
+         div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(8) .stColumn:nth-child(2) .stHorizontalBlock > *
+           {
             padding: 1.5rem;
             border: solid 1px rgba(248, 249, 250, 0.5);
             border-radius: 10px;    
@@ -38,23 +142,18 @@ def main():
             box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
             transition: box-shadow 0.5s ease-in-out, transform 0.3s ease-in-out;
         }
-        .stColumn:hover {
+        div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(5) .stColumn:nth-child(1) .stColumn:nth-child(2):hover,
+         div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(5) .stColumn:nth-child(1) .stColumn:nth-child(1):hover,
+          div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(5) .stColumn:nth-child(2) .stColumn:nth-child(1) .stMetric:hover,
+           div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(5) .stColumn:nth-child(2) .stColumn:nth-child(2):hover,
+           div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(8) > .stColumn:nth-child(1) .stHorizontalBlock .stColumn:nth-child(2):hover, 
+           div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(8) .stColumn:nth-child(1) .stHorizontalBlock .stColumn:nth-child(1) .stVerticalBlock .stElementContainer:hover,
+           div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(8) .stColumn:nth-child(2) .stHorizontalBlock > .stColumn:hover
+            {
             box-shadow: #0096c7 0px 3px 8px; 
             transform: translateY(-5px);
         }
-        .offer-box {
-            margin: 0.5rem;
-            padding: 1rem;
-            border: solid 1px rgba(248, 249, 250, 0.5);
-            border-radius: 10px;    
-            background-color: rgb(248, 249, 250);
-            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-            transition: box-shadow 0.5s ease-in-out, transform 0.3s ease-in-out;
-        }
-        .offer-box:hover {
-            box-shadow: #0096c7 0px 3px 8px; 
-            transform: translateY(-5px);
-        }
+    
         </style>
         """,
         unsafe_allow_html=True
@@ -95,35 +194,21 @@ def main():
     today = pd.Timestamp.today()
     offers_last_week = filtered_df[filtered_df["date_full"] >= (today - pd.Timedelta(days=1)) - pd.Timedelta(days=7)]["liczba_ofert"].sum()
     offers_last_month = filtered_df[filtered_df["date_full"] >= (today - pd.Timedelta(days=1)) - pd.Timedelta(days=30)]["liczba_ofert"].sum()
+    offers_last_year = filtered_df[filtered_df["date_full"] >= (today - pd.Timedelta(days=1)) - pd.Timedelta(days=365)]["liczba_ofert"].sum()
     total_offers = filtered_df["liczba_ofert"].sum()
-
-    
+   
     st.title("Liczba ofert")
 
     selected_experience_levels = ", ".join(st.session_state.get("selected_levels"))
 
     st.header(f"Liczba ofert na przestrzeni ostatniego czasu")
-
-    # Wyświetlenie metryk
-    #col1, col2, col3, col4 = st.columns([0.235, 0.365, 0.26, 0.14], gap="medium")
-    #col1, col2, col3 = st.columns([1.5, 3, 2], gap="large")
-    col1, col2, col3 = st.columns([0.235, 0.365, 0.4], gap="medium")
-    with col1:
-        st.metric(f"#### Liczba ofert z ostatniego tygodnia ({selected_experience_levels})", f"{offers_last_week:,}")
-    with col2:
-        st.metric(f"### Liczba ofert z ostatniego miesiąca ({selected_experience_levels})", f"{offers_last_month:,}")
-    with col3:
-        st.metric(f"##### Liczba ofert w systemie ({selected_experience_levels})", f"{total_offers:,}")
-
-    
-    
+  
 
     last_7_days = today - pd.Timedelta(days=8)
 
     week_data = filtered_df[filtered_df["date_full"] >= last_7_days]
     week_data = week_data.groupby(["date_full", "day_name"])["liczba_ofert"].sum().reset_index()
     week_data = week_data.sort_values("date_full")
-    print(week_data)
     
     ############################################
     # 🔹 Wykres słupkowy
@@ -181,7 +266,10 @@ def main():
 
 
     experience_data = filtered_df.groupby("experience_level")["liczba_ofert"].sum().reset_index()
-    experience_data_nf = df.groupby("experience_level")["liczba_ofert"].sum().reset_index()
+    experience_data_nf = df.groupby("experience_level")["liczba_ofert"].sum().reset_index().sort_values(
+        by="experience_level", 
+        key=lambda x: x.map({"Junior": 0, "Mid": 1, "Senior": 2, "C-level": 3})
+    )
 
     # Podstawowy wykres kołowy
     base = alt.Chart(experience_data).encode(
@@ -206,21 +294,20 @@ def main():
         fontSize=20
     )
 
-
-    col1, col2, col3, col4 = st.columns([0.235, 0.365, 0.26, 0.14], gap="medium")
-    with st.container():
-        with col1:
+    col1, col2 = st.columns([0.35,0.65], gap="medium")
+    with col1:
+        col11, col12 = st.columns(2, gap="medium")
+        with col11:
+            st.metric(f"### Liczba ofert z ostatniego tygodnia ({selected_experience_levels})", f"{offers_last_week:,}")
+        with col12:
             st.altair_chart(weekly_chart, use_container_width=True)
-        with col2: 
+    with col2:
+        col21, col22 = st.columns([1,1], gap='medium')
+        with col21:
+            st.metric(f"### Liczba ofert z ostatniego miesiąca ({selected_experience_levels})", f"{offers_last_month:,}")
+            st.metric(f"### Liczba ofert z ostatniego roku ({selected_experience_levels})", f"{offers_last_year:,}")
+        with col22:     
             st.altair_chart(stacked_chart, use_container_width=True) 
-        with col3: 
-            st.altair_chart(pie_chart_with_labels, use_container_width=True)
-        with col4: 
-            st.write("##### Liczba ofert - poziomy")
-            for index, row in experience_data_nf.iterrows():
-                with st.container():
-                    st.markdown(f'<div class="offer-box"><b>{row["experience_level"]}</b>: {row["liczba_ofert"]:,} ofert</div>', unsafe_allow_html=True)
-                    
 
 
 
@@ -252,18 +339,19 @@ def main():
         fontSize=20
     )
 
-    # 🔹 Układ kolumn (wykres + legenda)
-    col1, col2 = st.columns([0.86, 0.14], gap="medium")
-
+    col1, col2 = st.columns([0.65, 0.35], gap="medium")
     with col1:
-        st.altair_chart(time_chart, use_container_width=True)
-
-    with col2:
-        st.write("### Legenda")
-        
-        # Wyświetlenie legendy jako kolorowych znaczników
-        for level, color in color_mapping.items():
-            st.markdown(f'<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">'
-                        f'<div style="width: 15px; height: 15px; background-color: {color}; border-radius: 50%;"></div>'
-                        f'<span style="font-size: 16px;">{level}</span>'
-                        f'</div>', unsafe_allow_html=True)
+        col11, col12 = st.columns([1,1], gap="medium")
+        with col11:
+            for _, row in experience_data_nf.iterrows():
+                st.metric(label=f"{row['experience_level']}\nliczba ofert", value=f"{row['liczba_ofert']:,}")
+        with col12:
+            st.altair_chart(time_chart, use_container_width=True)
+            
+   
+    with col2:  
+        col21, col22 = st.columns([1,1], gap='medium')    
+        with col21:
+            st.metric(f"##### Liczba ofert w systemie ({selected_experience_levels})", f"{total_offers:,}")
+        with col22:
+            st.altair_chart(pie_chart_with_labels, use_container_width=True)
