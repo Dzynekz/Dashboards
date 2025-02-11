@@ -344,7 +344,7 @@ def main():
         col11, col12 = st.columns([1,1], gap="medium")
         with col11:
             for _, row in experience_data_nf.iterrows():
-                st.metric(label=f"{row['experience_level']}\nliczba ofert", value=f"{row['liczba_ofert']:,}")
+                st.metric(label=f"{row['experience_level']}", value=f"{row['liczba_ofert']:,}")
         with col12:
             st.altair_chart(time_chart, use_container_width=True)
             
