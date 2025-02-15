@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import streamlit as st
 import liczba_ofert
 import zarobki
+import popularne_technologie
 
 st.set_page_config(layout="wide")
 
@@ -24,7 +25,7 @@ st.markdown(
 
 # Sidebar navigation
 st.sidebar.title("Dashboard Menu")
-selected_page = st.sidebar.radio("Wybierz stronę:", ["Liczba Ofert", "Zarobki"])
+selected_page = st.sidebar.radio("Wybierz stronę:", ["Liczba Ofert", "Zarobki", "Popularne Technologie"])
 st.sidebar.markdown("---") 
 
 # Display the selected page
@@ -32,3 +33,5 @@ if selected_page == "Liczba Ofert":
     liczba_ofert.main()
 elif selected_page == "Zarobki":
     zarobki.main()
+elif selected_page == "Popularne Technologie":
+    popularne_technologie.main()
