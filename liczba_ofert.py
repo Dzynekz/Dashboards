@@ -204,7 +204,7 @@ def main():
     st.header(f"Liczba ofert na przestrzeni ostatniego czasu")
   
 
-    last_7_days = today - pd.Timedelta(days=8)
+    last_7_days = today - pd.Timedelta(days=7)
 
     week_data = filtered_df[filtered_df["date_full"] >= last_7_days]
     week_data = week_data.groupby(["date_full", "day_name"])["liczba_ofert"].sum().reset_index()
@@ -330,7 +330,7 @@ def main():
     time_chart = alt.Chart(monthly_data).mark_line(point=True).encode(
         x=alt.X("year_month:T", title="Miesiąc", axis=alt.Axis(labelAngle=-45)),
         y=alt.Y("liczba_ofert:Q", title="Liczba ofert"),
-        color=alt.Color("experience_level:N", scale=alt.Scale(domain=list(color_mapping.keys()), range=list(color_mapping.values())), legend=None)  # 🔹 Brak legendy
+        color=alt.Color("experience_level:N", legend=None)  # 🔹 Brak legendy
     ).properties(
         title="Liczba ofert na przestrzeni miesięcy"
     ).configure(
