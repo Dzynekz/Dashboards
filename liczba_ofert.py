@@ -193,8 +193,17 @@ def main():
     # Dynamiczne metryki
     today = pd.Timestamp.today()
     offers_last_week = filtered_df[filtered_df["date_full"] >= (today - pd.Timedelta(days=1)) - pd.Timedelta(days=7)]["liczba_ofert"].sum()
+    offers_ll_week = filtered_df[
+        (filtered_df["date_full"] <= (today - pd.Timedelta(days=1)) - pd.Timedelta(days=7)) &
+        (filtered_df["date_full"] >= (today - pd.Timedelta(days=1)) - pd.Timedelta(days=14))]["liczba_ofert"].sum()
     offers_last_month = filtered_df[filtered_df["date_full"] >= (today - pd.Timedelta(days=1)) - pd.Timedelta(days=30)]["liczba_ofert"].sum()
+    offers_ll_month = filtered_df[
+        (filtered_df["date_full"] <= (today - pd.Timedelta(days=1)) - pd.Timedelta(days=30)) &
+        (filtered_df["date_full"] >= (today - pd.Timedelta(days=1)) - pd.Timedelta(days=60))]["liczba_ofert"].sum()
     offers_last_year = filtered_df[filtered_df["date_full"] >= (today - pd.Timedelta(days=1)) - pd.Timedelta(days=365)]["liczba_ofert"].sum()
+    offers_ll_year = filtered_df[
+        (filtered_df["date_full"] <= (today - pd.Timedelta(days=1)) - pd.Timedelta(days=365)) &
+        (filtered_df["date_full"] >= (today - pd.Timedelta(days=1)) - pd.Timedelta(days=730))]["liczba_ofert"].sum()
     total_offers = filtered_df["liczba_ofert"].sum()
    
     st.title("Liczba ofert")
@@ -298,14 +307,14 @@ def main():
     with col1:
         col11, col12 = st.columns(2, gap="medium")
         with col11:
-            st.metric(f"### Liczba ofert z ostatniego tygodnia ({selected_experience_levels})", f"{offers_last_week:,}")
+            st.metric(f"### Liczba ofert z ostatniego tygodnia ({selected_experience_levels})", f"{offers_last_week:,}", f"{offers_last_week - offers_ll_week:,}", help='Różnica w porównaniu do poprzedniego tygodnia.')
         with col12:
             st.altair_chart(weekly_chart, use_container_width=True)
     with col2:
         col21, col22 = st.columns([1,1], gap='medium')
         with col21:
-            st.metric(f"### Liczba ofert z ostatniego miesiąca ({selected_experience_levels})", f"{offers_last_month:,}")
-            st.metric(f"### Liczba ofert z ostatniego roku ({selected_experience_levels})", f"{offers_last_year:,}")
+            st.metric(f"### Liczba ofert z ostatniego miesiąca ({selected_experience_levels})", f"{offers_last_month:,}", f"{offers_last_month - offers_ll_month:,}", help='Różnica w porównaniu do poprzedniego miesiąca.')
+            st.metric(f"### Liczba ofert z ostatniego roku ({selected_experience_levels})", f"{offers_last_year:,}", f"{offers_last_year - offers_ll_year:,}", help='Różnica w porównaniu do poprzedniego roku.')
         with col22:     
             st.altair_chart(stacked_chart, use_container_width=True) 
 
