@@ -82,6 +82,9 @@ def main():
                      (df["level_name"].isin(st.session_state["selected_skill_levels"])) &
                      (df["field_name"].isin(selected_fields))]
 
+
+
+
     # Grupowanie danych i wybór top 20 technologii ogólnie
     top_20_skills = (filtered_df.groupby("skill_name")
                      .agg({"liczba_ofert": "sum"})
@@ -112,14 +115,14 @@ def main():
     df_skill_order = df_skill_order.sort_values(['skill_name', 'level_name'])
     # Calculate cumulative positions for text labels
     df_skill_order['text_position'] = df_skill_order.groupby('skill_name')['total_offers'].cumsum() - (df_skill_order['total_offers'] / 2)
-    st.dataframe(df_skill_order)
+    #st.dataframe(df_skill_order)
 
     # Tworzenie wykresu z podziałem na poziomy zaawansowania
-    bars = alt.Chart(df_skill_order).mark_bar().encode(
-    x=alt.X('sum(total_offers):Q', title='Liczba ofert').stack('zero'),
-    y=alt.Y('skill_name:N', title='Technologia', sort=skill_order),
-    color=alt.Color('level_name:N', title='Poziom zaawansowania', sort=level_order),
-    order=alt.Order('color_level_name_sort_index:Q')
+    bars = alt.Chart(df_skill_order, height=800).mark_bar(cornerRadiusEnd=5).encode(
+        x=alt.X('sum(total_offers):Q', title='Liczba ofert').stack('zero'),
+        y=alt.Y('skill_name:N', title='Technologia', sort=skill_order),
+        color=alt.Color('level_name:N', title='Poziom zaawansowania', sort=level_order),
+        order=alt.Order('color_level_name_sort_index:Q')
     )
 
     text = alt.Chart(df_skill_order).mark_text(align='center',baseline='middle', color='white').encode(
