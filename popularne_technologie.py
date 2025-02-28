@@ -16,6 +16,48 @@ engine = create_engine(connection_string, use_setinputsizes=False) # https://git
 
 
 def main():
+    # Custom CSS for styling
+    st.markdown(
+        """
+        <style>
+        .main .block-container {
+            max-width: 95%;
+            padding: 1rem;  
+        }
+        .stHeading {
+            margin-bottom: 1rem;
+            margin-left: 5%;
+            margin-right: 5%;
+        }
+        .stMainBlockContainer {
+            padding: 3rem;  
+        }
+
+        .stMain > .stMainBlockContainer > div[data-testid="stVerticalBlockBorderWrapper"] div[data-testid="stVerticalBlockBorderWrapper"] {
+            margin-bottom: 1.5rem;
+            margin-left: 5%;
+            margin-right: 5%;
+            padding: 1.5rem;
+            border: solid 1px rgba(248, 249, 250, 0.5);
+            border-radius: 10px;    
+            background-color: rgb(248, 249, 250);
+            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+            transition: box-shadow 0.5s ease-in-out, transform 0.3s ease-in-out;
+        }
+
+        .stMain > .stMainBlockContainer > div[data-testid="stVerticalBlockBorderWrapper"] div[data-testid="stVerticalBlockBorderWrapper"]:hover
+        {
+            box-shadow: #0096c7 0px 3px 8px; 
+            transform: translateY(-5px);
+        }
+        .st-key-plot > .stElementContainer:first-of-type 
+        {
+            margin: 1.5rem;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
 
     @st.cache_data
     def get_data():
@@ -33,14 +75,28 @@ def main():
         df["date_full"] = pd.to_datetime(df["date_full"])
         return df
     
+    def get_data2():
+        with engine.connect() as connection:
+             df = pd.read_sql('''
+                SELECT d.date_full, f.field_name, el.experience_level_name, COUNT(jo.job_offer_id) as 'liczba_ofert'
+                FROM Fields as f JOIN Job_Offers as jo on f.field_id=jo.field_id
+                    JOIN Experience_Levels as el on el.experience_level_id=jo.experience_level_id
+                    JOIN Dates as d on d.date_id = jo.date_id
+                GROUP BY d.date_full, f.field_name, el.experience_level_name
+            ''', connection)
+        df["date_full"] = pd.to_datetime(df["date_full"])
+        return df
+    
+    
     df = get_data()
+    df2 = get_data2()
 
     # Sidebar – wybór poziomu doświadczenia
     st.sidebar.title("Wybierz poziom doświadczenia")
-    job_levels_options = df["experience_level_name"].unique().tolist()
+    job_levels_options = ['Junior','Mid','Senior','C-level']
 
     if "selected_levels" not in st.session_state:
-        st.session_state["selected_levels"] = ["Junior", "Senior"]
+        st.session_state["selected_levels"] = ['Junior', 'Mid', 'Senior']
 
     selected_levels = []
     for level in job_levels_options:
@@ -51,10 +107,10 @@ def main():
 
     # Sidebar - wybór poziomu umiejętności
     st.sidebar.title("Wybierz poziom umiejętności")
-    skill_levels_options = df["level_name"].unique().tolist()
+    skill_levels_options = ['Nice To Have','Junior','Regular','Advanced','Master']
 
     if "selected_skill_levels" not in st.session_state:
-        st.session_state["selected_skill_levels"] = ['Nice To Have', 'Regular', 'Advanced', 'Master']
+        st.session_state["selected_skill_levels"] = ['Nice To Have', 'Junior', 'Regular', 'Advanced', 'Master']
 
     selected_skill_levels = []
     for level in skill_levels_options:
@@ -64,26 +120,30 @@ def main():
     st.session_state["selected_skill_levels"] = selected_skill_levels
 
 
+
+
     # Wybór dziedzin obok wykresu za pomocą przycisków
     st.title("Najpopularniejsze technologie")
     st.header("Top 20 technologii w wybranych dziedzinach z podziałem na poziomy zaawansowania")
 
+
     fields_options = df["field_name"].unique().tolist()
     selected_fields = []
 
-    selected_fields = st.pills("Dziedziny", fields_options, selection_mode="multi")
-    if not selected_fields:  # If nothing is selected, use all fields
-        selected_fields = fields_options
-
-   
+    with st.container():
+        selected_fields = st.pills("Dziedziny", fields_options, selection_mode="multi")
+        if not selected_fields:  # If nothing is selected, use all fields
+            selected_fields = fields_options
 
     # Filtrowanie danych
     filtered_df = df[(df["experience_level_name"].isin(st.session_state["selected_levels"])) &
                      (df["level_name"].isin(st.session_state["selected_skill_levels"])) &
                      (df["field_name"].isin(selected_fields))]
-
-
-
+    
+    filtered_df2 = df2[(df2["experience_level_name"].isin(st.session_state["selected_levels"])) &
+                     (df2["field_name"].isin(selected_fields))]
+    
+    offers = filtered_df2["liczba_ofert"].sum()
 
     # Grupowanie danych i wybór top 20 technologii ogólnie
     top_20_skills = (filtered_df.groupby("skill_name")
@@ -131,5 +191,12 @@ def main():
         detail='level_name:N',
         text=alt.Text('sum(total_offers):Q', format='.0f')
     )
-
-    st.altair_chart(bars + text, use_container_width=True)
+    
+    chart = (bars + text).properties(
+        title="Liczba ofert w ostatnich 7 dniach"
+    ).configure(
+        background='rgb(248, 249, 250)' 
+    )
+    with st.container(key='plot'):
+        st.metric(f"Liczba ofert odpowiadających kryteriom:", f"{offers}")
+        st.altair_chart(chart, use_container_width=True)
