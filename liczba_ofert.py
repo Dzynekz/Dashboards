@@ -41,7 +41,6 @@ def main():
             margin-left: 5%;
             margin-right: 5%;
         }
-
         
         div[data-testid="stVerticalBlock"] > div[data-testid="stHorizontalBlock"]:nth-child(5) {
             display: flex;
@@ -119,13 +118,6 @@ def main():
         div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(8) .stColumn:nth-child(2) .stHorizontalBlock > * {
             width: 100%;
         }
-    
-         
-        
-
-        
-
-
 
         div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(5) .stColumn:nth-child(1) .stColumn:nth-child(2),
          div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(5) .stColumn:nth-child(1) .stColumn:nth-child(1),
@@ -178,7 +170,7 @@ def main():
     job_levels_options = df["experience_level"].unique().tolist()
 
     if "selected_levels" not in st.session_state:
-        st.session_state["selected_levels"] = ["Junior", "Senior"]
+        st.session_state["selected_levels"] = ["Junior", "Mid", "Senior"]
 
     selected_levels = []
     for level in job_levels_options:
@@ -213,7 +205,7 @@ def main():
     st.header(f"Liczba ofert na przestrzeni ostatniego czasu")
   
 
-    last_7_days = today - pd.Timedelta(days=7)
+    last_7_days = today - pd.Timedelta(days=8)
 
     week_data = filtered_df[filtered_df["date_full"] >= last_7_days]
     week_data = week_data.groupby(["date_full", "day_name"])["liczba_ofert"].sum().reset_index()
@@ -330,23 +322,29 @@ def main():
     # 🔹 Grupowanie danych miesięcznie zamiast rocznie
     monthly_data = filtered_df.groupby(["year_month", "experience_level"])["liczba_ofert"].sum().reset_index()
 
-    # 🔹 Ustalenie niestandardowej palety kolorów
-    color_palette = ["#0096c7", "#0077b6", "#48cae4", "#00b4d8", "#90e0ef", "#ADE8F4"]
-    experience_levels = monthly_data["experience_level"].unique()
-    color_mapping = dict(zip(experience_levels, color_palette[:len(experience_levels)]))
 
     # 🔹 Tworzenie wykresu z ukrytą legendą
-    time_chart = alt.Chart(monthly_data).mark_line(point=True).encode(
+    base = alt.Chart(monthly_data).encode(
+        alt.Color("experience_level:N", title="Poziom Doświadczenia")  # Dodanie tytułu legendy
+    ).properties(
+        width=600
+    )
+
+    # 🔹 Wykres warstwowy zamiast liniowego
+    area = base.mark_area(opacity=0.6).encode(
         x=alt.X("year_month:T", title="Miesiąc", axis=alt.Axis(labelAngle=-45)),
         y=alt.Y("liczba_ofert:Q", title="Liczba ofert"),
-        color=alt.Color("experience_level:N", legend=None)  # 🔹 Brak legendy
-    ).properties(
-        title="Liczba ofert na przestrzeni miesięcy"
-    ).configure(
+    )
+
+    # Finalny wykres
+    time_chart = (area).configure(
         background='rgb(248, 249, 250)'
     ).configure_title(
         fontSize=20
+    ).properties(
+        title="Liczba ofert na przestrzeni miesięcy"
     )
+
 
     col1, col2 = st.columns([0.65, 0.35], gap="medium")
     with col1:
