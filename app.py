@@ -33,7 +33,7 @@ elif selected_page == "Zarobki":
     zarobki.main()
 elif selected_page == "Technologie":
     popularne_technologie.main()
-elif selected_page == "Mapa Polski":
-    mapa_polski.main()
+#elif selected_page == "Mapa Polski":
+#    mapa_polski.main()
 elif selected_page == "Rozkład Pareto":
     rozklad_pareto.main()
