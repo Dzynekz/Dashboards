@@ -2,7 +2,7 @@ from sqlalchemy import create_engine, text
 from dotenv import load_dotenv
 
 import streamlit as st
-import liczba_ofert, zarobki, popularne_technologie, mapa_polski, rozklad_pareto
+import liczba_ofert, zarobki, popularne_technologie, rozklad_pareto
 
 st.set_page_config(layout="wide")
 
