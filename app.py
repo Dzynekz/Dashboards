@@ -2,9 +2,7 @@ from sqlalchemy import create_engine, text
 from dotenv import load_dotenv
 
 import streamlit as st
-import liczba_ofert
-import zarobki
-import popularne_technologie
+import liczba_ofert, zarobki, popularne_technologie, mapa_polski, rozklad_pareto
 
 st.set_page_config(layout="wide")
 
@@ -25,7 +23,7 @@ st.markdown(
 
 # Sidebar navigation
 st.sidebar.title("Dashboard Menu")
-selected_page = st.sidebar.radio("Wybierz stronę:", ["Liczba Ofert", "Zarobki", "Popularne Technologie"])
+selected_page = st.sidebar.radio("Wybierz stronę:", ["Liczba Ofert", "Zarobki", "Technologie", 'Rozkład Pareto'])
 st.sidebar.markdown("---") 
 
 # Display the selected page
@@ -33,5 +31,9 @@ if selected_page == "Liczba Ofert":
     liczba_ofert.main()
 elif selected_page == "Zarobki":
     zarobki.main()
-elif selected_page == "Popularne Technologie":
+elif selected_page == "Technologie":
     popularne_technologie.main()
+elif selected_page == "Mapa Polski":
+    mapa_polski.main()
+elif selected_page == "Rozkład Pareto":
+    rozklad_pareto.main()
