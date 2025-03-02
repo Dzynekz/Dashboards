@@ -220,15 +220,8 @@ def main():
         selected_offer = st.selectbox("Wybierz ofertę: ", filtered_top5_df["job_offer_name"].tolist())
         offer_url = f"https://justjoin.it/job-offer/{selected_offer}"
 
-        def open_page(url):
-            open_script= """
-                <script type="text/javascript">
-                    window.open('%s', '_blank').focus();
-                </script>
-            """ % (url)
-            html(open_script)
 
-        st.button('Open link', on_click=open_page, args=(offer_url,))
+        st.page_link(offer_url, label="Przejdź do oferty pracy", icon="🌎")
 
 
 
