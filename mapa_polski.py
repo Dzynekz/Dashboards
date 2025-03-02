@@ -61,7 +61,7 @@ def main():
     def get_data_top5():
         with engine.connect() as connection:
             df = pd.read_sql('''
-                SELECT jo.job_offer_id, f.field_name, jo.latitude, jo.longitude, d.date_full, c.city_name, co.company_name,
+                SELECT jo.job_offer_id, jo.job_title, f.field_name, jo.latitude, jo.longitude, d.date_full, c.city_name, co.company_name,
                         ((COALESCE(s.salary_from, 0) + COALESCE(s.salary_to, 0)) / 2) as salary
                 FROM Job_Offers as jo JOIN Cities as c on jo.city_id=c.city_id
                 JOIN Dates as d on jo.date_id=d.date_id
@@ -145,20 +145,49 @@ def main():
         st.plotly_chart(fig_cities, use_container_width=True)
     
     
+
+
     top5_df = get_data_top5()
 
-    fields_options = top5_df["city_name"].unique().tolist()
+    # Wybór miasta
+    cities_options = top5_df["city_name"].unique().tolist()
 
-    selected_city = st.selectbox("Wybierz miasto", fields_options)
+    # Inicjalizacja session state dla miasta, jeśli nie istnieje
+    if "selected_city" not in st.session_state:
+        st.session_state["selected_city"] = "Warszawa"
 
-    # Filtrowanie danych tylko dla wybranego miasta
-    filtered_top5_df = top5_df[top5_df["city_name"] == selected_city]
-    filtered_top5_df.loc[filtered_top5_df["salary"] == 0, "salary"] = np.nan
-    filtered_top5_df["salary"] = filtered_top5_df["salary"].apply(
+    # Widget selectbox z kluczem do automatycznej aktualizacji session_state
+    st.selectbox(
+        "Wybierz miasto", 
+        cities_options, 
+        index=cities_options.index(st.session_state["selected_city"]), 
+        key="selected_city"
+    )
+
+    # Zamiana wartości 0 na NaN
+    top5_df.loc[top5_df["salary"] == 0, "salary"] = np.nan
+
+    # Konwersja wynagrodzenia na liczbę (dla filtrów)
+    top5_df["salary_numeric"] = pd.to_numeric(top5_df["salary"], errors='coerce')
+
+    # Suwak z **stałym zakresem** od 0 do 100 000 PLN
+    salary_range = st.slider(
+        "Zakres wynagrodzenia (PLN)", 
+        0, 100000, (0, 100000)
+    )
+
+    # Filtrowanie po wybranym mieście i zakresie wynagrodzenia
+    filtered_top5_df = top5_df[
+        (top5_df["city_name"] == st.session_state["selected_city"]) & 
+        (top5_df["salary_numeric"].between(salary_range[0], salary_range[1], inclusive="both"))
+    ]
+
+    # Ponowne formatowanie wynagrodzenia
+    filtered_top5_df["salary"] = filtered_top5_df["salary_numeric"].apply(
         lambda x: f"{x:.2f} PLN" if not pd.isna(x) else "Brak danych"
     )
 
-    # Tworzenie mapy z Plotly
+    # Tworzenie wykresu
     fig = px.scatter_mapbox(
         filtered_top5_df,
         lat='latitude',
@@ -166,18 +195,26 @@ def main():
         zoom=12,
         color='field_name',
         color_continuous_scale=px.colors.cyclical.IceFire,
-        hover_data={  # Nowe dane do podglądu po najechaniu
-        'field_name': True, 
-        'salary': True,  
-        'company_name': True,
-        'longitude': False,
-        'latitude': False  
-    }
+        title='Oferty w największych miastach',
+        custom_data=['job_title', 'company_name', 'salary', 'field_name']
     )
+
+    fig.update_traces(
+        hovertemplate="<b>%{customdata[0]}</b><br>" + 
+                    "<b>Wynagrodzenie:</b> %{customdata[2]}<br>" + 
+                    "<b>Dziedzina:</b> %{customdata[3]}<br>" +
+                    "<b>Firma:</b> %{customdata[1]}"
+    )
+
     fig.update_layout(
         mapbox_style="carto-positron",
-        height=1000 
+        height=1000
     )
-    
-    with st.container(key='plot'):
+
+    # Wyświetlenie wykresu
+    with st.container():
         st.plotly_chart(fig, use_container_width=True)
+
+
+
+
