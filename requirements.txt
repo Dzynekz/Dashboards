@@ -8,3 +8,4 @@ scipy
 vegafusion
 plotly
 geopandas
+webbrowser
