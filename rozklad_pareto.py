@@ -36,10 +36,9 @@ def main():
             display: flex;
             flex-direction: column-reverse;
         }
-        .stMetric {
-        }
 
-        .stHorizontalBlock:nth-child(4) > .stColumn,
+        .stHorizontalBlock:nth-child(4) > .stColumn:nth-child(1),
+        .stHorizontalBlock:nth-child(4) > .stColumn:nth-child(2) .stHorizontalBlock .stColumn,
         .stHorizontalBlock:nth-child(5) > .stColumn:nth-child(2),
         .stMetric {
             padding: 1.5rem;
@@ -54,13 +53,24 @@ def main():
             display:flex;
             flex-direction: row;
         }
-
-        .stColumn:nth-child(1),
-         .stColumn:nth-child(2) {
+        .stHorizontalBlock:nth-child(4) > .stColumn:nth-child(2) .stHorizontalBlock {
+            display:flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+        .stHorizontalBlock:nth-child(4) > .stColumn:nth-child(1),
+        .stHorizontalBlock:nth-child(4) > .stColumn:nth-child(1) .stHorizontalBlock > .stColumn,
+        .stHorizontalBlock:nth-child(4) > .stColumn:nth-child(2),
+        .stHorizontalBlock:nth-child(5) > .stColumn,
+        .stHorizontalBlock:nth-child(5) > .stColumn:nth-child(2) .stHorizontalBlock > .stColumn
+         {
             width: 100%;
         }
-        .stHorizontalBlock:nth-child(4) .stColumn .stColumn:nth-child(2) {
+
+        .stHorizontalBlock:nth-child(4) > .stColumn:nth-child(2) .stHorizontalBlock > .stColumn:nth-child(1) {
+            min-width:700px;
         }
+
         .stHorizontalBlock:nth-child(4),
          .stHorizontalBlock:nth-child(5),
           .stMain .stVerticalBlock:nth-child(1) > .stElementContainer:nth-child(3) > .stHeading {
@@ -68,18 +78,14 @@ def main():
             margin-right: 5%;
         }
 
-        .stColumn:nth-child(1) .stColumn,
-        .stColumn:nth-child(2) .stColumn {
-            width: 100%;
-        }
-
         .stExpander {
             width: 100%;
         }
 
         .stMetric:hover,
-        .stHorizontalBlock:nth-child(4) > .stColumn:hover,
-        .stHorizontalBlock:nth-child(5) > .stColumn:nth-child(2):hover
+        .stHorizontalBlock:nth-child(4) > .stColumn:nth-child(1):hover,
+        .stHorizontalBlock:nth-child(5) > .stColumn:nth-child(2):hover,
+        .stHorizontalBlock:nth-child(4) > .stColumn:nth-child(2) .stHorizontalBlock .stColumn:hover
         {
             box-shadow: #0096c7 0px 3px 8px; 
             transform: translateY(-5px);
@@ -144,7 +150,7 @@ def main():
             st.markdown(f"<h5>Interpretacja: Około {pareto_threshold['cum_miasta_pct'] * 100:.2f}%  miast ({int(pareto_threshold['cum_miasta_pct'] * len(df))}) generuje {threshold_pct * 100:.0f}% wszystkich ofert pracy.</h5>", unsafe_allow_html=True)
 
         with col14:
-            pareto_chart = alt.Chart(df_sorted).mark_line(point=True).encode(
+            pareto_chart = alt.Chart(df_sorted).mark_line(color='#0096c7', point=True).encode(
                 x=alt.X('cum_miasta_pct:Q', title='Procent miast (od największej liczby ofert)'),
                 y=alt.Y('cum_oferty_pct:Q', title='Skumulowany procent ofert pracy')
             ) + alt.Chart(pd.DataFrame({'x': [pareto_threshold['cum_miasta_pct']], 'y': [pareto_threshold['cum_oferty_pct']]})).mark_point(color='red', size=100).encode(
@@ -172,40 +178,60 @@ def main():
             
         
     # Grupowanie danych
-    hist_data = df.groupby("liczba_ofert").agg({"city_name": lambda x: ", ".join(x) if len(x) == 1 else ""}).reset_index()
-    hist_data["liczba_miast"] = df.groupby("liczba_ofert").size().values
-
+    city_counts = df.groupby("city_name")["liczba_ofert"].sum().reset_index()
+    # Wybór top 10 miast pod względem liczby ofert
+    top_10_cities = city_counts.nlargest(10, "liczba_ofert")
 
     # Tworzenie wykresu słupkowego
-    bars = alt.Chart(hist_data).mark_bar(size=10).encode(
-        x=alt.X('liczba_ofert:O', title='Liczba ofert pracy'),
-        y=alt.Y('liczba_miast:Q', title='Liczba miast')
-    ).properties(height=400)
-
-    # Dodanie etykiet **nad wybranymi kolumnami**
-    labels = alt.Chart(hist_data[hist_data["liczba_miast"] == 1]).mark_text(
-        align='left',  # Wycentrowanie nad słupkiem
-        baseline='middle',  # Umieszczenie nad kolumną 
-        size=15,
-        angle=270,
-        dx=5
-    ).encode(
-        x='liczba_ofert:O',
-        y=alt.Y('liczba_miast:Q', title='Liczba miast'),
-        text='city_name:N'
-    )
-
-
-    chart = (bars + labels).configure(
+    chart_top10 = alt.Chart(top_10_cities).mark_bar(color='#0096c7').encode(
+        x=alt.X('city_name:N', title='Miasto', sort='-y', axis=alt.Axis(labelAngle=0)),  # Sortowanie według liczby ofert
+        y=alt.Y('liczba_ofert:Q', title='Liczba ofert pracy'),
+        tooltip=['city_name', 'liczba_ofert']
+    ).configure(
         background='rgb(248, 249, 250)'  # Tło wykresu
     ).properties(
-        title="Histogram ofert pracy"
+        height=400,
+        title="Top 10 miast pod względem liczby ofert pracy"
     ).configure_title(
         fontSize=20
     )
+
+
+    # 📌 Tworzenie wykresu kołowego (Pie Chart)
+    top_10 = df.nlargest(10, "liczba_ofert")
+
+    # Suma ofert dla pozostałych miast
+    inne_suma = df[~df["city_name"].isin(top_10["city_name"])]["liczba_ofert"].sum()
+
+    # Tworzenie nowego DF z 10 miastami i dodatkową kategorią "Inne"
+    df_top10_inne = pd.concat([
+        top_10,
+        pd.DataFrame([{"city_name": "Inne", "liczba_ofert": inne_suma}])
+    ], ignore_index=True)
+
+    
+    chart = alt.Chart(df_top10_inne).mark_arc().encode(
+        theta=alt.Theta("liczba_ofert:Q"),
+        color=alt.Color("city_name:N", title="Miasto",
+                    scale=alt.Scale(scheme="category20")), 
+        order=alt.Order("liczba_ofert:Q", sort="descending"),
+        tooltip=["city_name", "liczba_ofert"]
+    ).configure(
+        background='rgb(248, 249, 250)'  # Tło wykresu
+    ).properties(
+        title="TOP 10 miast + 'Inne' (oferty pracy)"
+    ).configure_title(
+        fontSize=20
+    )
+
+
     # Wyświetlenie wykresu
     with col2:
-        st.altair_chart(chart, use_container_width=True)
+        col21, col22 = st.columns(2)
+        with col21:
+            st.altair_chart(chart_top10, use_container_width=True)
+        with col22:
+            st.altair_chart(chart, use_container_width=True)
        
     # Obliczenie dodatkowych metryk
     mean = np.mean(df['liczba_ofert'])
@@ -270,7 +296,7 @@ def main():
             theo_quantiles = pareto.ppf(np.linspace(0.01, 0.99, len(emp_quantiles)), alpha, loc=0, scale=xm)
             
             qq_df = pd.DataFrame({'Teoretyczne': theo_quantiles, 'Empiryczne': emp_quantiles})
-            qq_chart = alt.Chart(qq_df).mark_point(color='blue').encode(
+            qq_chart = alt.Chart(qq_df).mark_point(color='#0096c7').encode(
                 x=alt.X('Teoretyczne:Q', scale=alt.Scale(type='log'), title='Teoretyczne (log)'),
                 y=alt.Y('Empiryczne:Q', scale=alt.Scale(type='log'), title='Empiryczne (log)')
             ) + alt.Chart(qq_df).mark_line(color='red').encode(
