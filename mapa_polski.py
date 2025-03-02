@@ -86,7 +86,7 @@ def main():
     df_pow['formatted'] = df_pow['district_id_gus'].apply(format_values)
 
     # Odczytanie pliku JSON
-    geojson_path_woj = "woj.json"
+    geojson_path_woj = "wojewodztwa/woj.json"
     with open(geojson_path_woj, "r", encoding="utf-8") as f:
         geojson_data_woj = json.load(f)
     geo_df_woj = gpd.GeoDataFrame.from_features(geojson_data_woj["features"])
@@ -107,7 +107,7 @@ def main():
 
 
     # Odczytanie pliku JSON
-    geojson_path_pow = "pow.json"
+    geojson_path_pow = "powiaty/pow.json"
     with open(geojson_path_pow, "r", encoding="utf-8") as f:
         geojson_data_pow = json.load(f)
     geo_df_pow = gpd.GeoDataFrame.from_features(geojson_data_pow["features"])
