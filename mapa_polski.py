@@ -6,6 +6,7 @@ import json
 import numpy as np
 import webbrowser
 from sqlalchemy import create_engine
+from streamlit.components.v1 import html
 
 # 🔹 Połączenie z bazą danych
 server = st.secrets["database"]["DB_SERVER"]
@@ -218,9 +219,16 @@ def main():
 
         selected_offer = st.selectbox("Wybierz ofertę: ", filtered_top5_df["job_offer_name"].tolist())
         offer_url = f"https://justjoin.it/job-offer/{selected_offer}"
-        
-        if st.button("Otwórz ofertę"):
-            webbrowser.open_new_tab(offer_url)
+
+        def open_page(url):
+            open_script= """
+                <script type="text/javascript">
+                    window.open('%s', '_blank').focus();
+                </script>
+            """ % (url)
+            html(open_script)
+
+        st.button('Open link', on_click=open_page, args=(offer_url,))
 
 
 
