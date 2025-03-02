@@ -4,6 +4,7 @@ import geopandas as gpd
 import plotly.express as px
 import json
 import numpy as np
+import webbrowser
 from sqlalchemy import create_engine
 
 # 🔹 Połączenie z bazą danych
@@ -61,7 +62,7 @@ def main():
     def get_data_top5():
         with engine.connect() as connection:
             df = pd.read_sql('''
-                SELECT jo.job_offer_id, jo.job_title, f.field_name, jo.latitude, jo.longitude, d.date_full, c.city_name, co.company_name,
+                SELECT jo.job_offer_id, jo.job_title, jo.job_offer_name, f.field_name, jo.latitude, jo.longitude, d.date_full, c.city_name, co.company_name,
                         ((COALESCE(s.salary_from, 0) + COALESCE(s.salary_to, 0)) / 2) as salary
                 FROM Job_Offers as jo JOIN Cities as c on jo.city_id=c.city_id
                 JOIN Dates as d on jo.date_id=d.date_id
@@ -196,14 +197,14 @@ def main():
         color='field_name',
         color_continuous_scale=px.colors.cyclical.IceFire,
         title='Oferty w największych miastach',
-        custom_data=['job_title', 'company_name', 'salary', 'field_name']
+        custom_data=['job_title', 'company_name', 'salary', 'field_name', 'job_offer_name']
     )
 
     fig.update_traces(
         hovertemplate="<b>%{customdata[0]}</b><br>" + 
                     "<b>Wynagrodzenie:</b> %{customdata[2]}<br>" + 
-                    "<b>Dziedzina:</b> %{customdata[3]}<br>" +
-                    "<b>Firma:</b> %{customdata[1]}"
+                    "<b>Firma:</b> %{customdata[1]}<br>" +
+                    "<b>ID:</b> %{customdata[4]}"
     )
 
     fig.update_layout(
@@ -214,6 +215,12 @@ def main():
     # Wyświetlenie wykresu
     with st.container():
         st.plotly_chart(fig, use_container_width=True)
+
+        selected_offer = st.selectbox("Wybierz ofertę: ", filtered_top5_df["job_offer_name"].tolist())
+        offer_url = f"https://justjoin.it/job-offer/{selected_offer}"
+        
+        if st.button("Otwórz ofertę"):
+            webbrowser.open_new_tab(offer_url)
 
 
 
