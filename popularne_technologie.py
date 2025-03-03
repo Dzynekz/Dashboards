@@ -1,8 +1,9 @@
 from sqlalchemy import create_engine, text
-
+import networkx as nx
 import streamlit as st
 import pandas as pd
 import altair as alt
+import matplotlib.pyplot as plt
 
 server = st.secrets["database"]["DB_SERVER"]
 database = st.secrets["database"]["DB_DATABASE"]
@@ -74,7 +75,7 @@ def main():
             ''', connection)
         df["date_full"] = pd.to_datetime(df["date_full"])
         return df
-    
+    @st.cache_data
     def get_data2():
         with engine.connect() as connection:
              df = pd.read_sql('''
@@ -86,10 +87,22 @@ def main():
             ''', connection)
         df["date_full"] = pd.to_datetime(df["date_full"])
         return df
+    @st.cache_data
+    def get_data3():
+        with engine.connect() as connection:
+             df = pd.read_sql('''
+                SELECT f.field_name, s.skill_name, COUNT(jo.job_offer_id) as 'liczba_ofert'
+                FROM Fields as f JOIN Job_Offers as jo on f.field_id=jo.field_id
+                    JOIN Job_Offers_Skills as jos on jos.job_offer_id=jo.job_offer_id
+                    JOIN Skills as s on s.skill_id=jos.skill_id
+                GROUP BY f.field_name, s.skill_name
+            ''', connection)
+        return df
     
     
     df = get_data()
     df2 = get_data2()
+    df3 = get_data3()
 
     # Sidebar – wybór poziomu doświadczenia
     st.sidebar.title("Wybierz poziom doświadczenia")
@@ -193,10 +206,11 @@ def main():
     )
     
     chart = (bars + text).properties(
-        title="Liczba ofert w ostatnich 7 dniach"
+        title="Najczęstsze wymagania w wybranych ofertach:"
     ).configure(
         background='rgb(248, 249, 250)' 
     )
     with st.container(key='plot'):
         st.metric(f"Liczba ofert odpowiadających kryteriom:", f"{offers}")
         st.altair_chart(chart, use_container_width=True)
+
