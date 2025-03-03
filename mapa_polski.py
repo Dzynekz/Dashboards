@@ -17,6 +17,87 @@ connection_string = f"mssql+pyodbc://{username}:{password}@{server}/{database}?d
 engine = create_engine(connection_string, use_setinputsizes=False)
 
 def main():
+    # Custom CSS for styling
+    st.markdown(
+        """
+        <style>
+        .main .block-container {
+            max-width: 95%;
+            padding: 1rem;  
+        }
+        .stHeading {
+            margin-bottom: 1rem;
+            margin-left: 5%;
+            margin-right: 5%;
+        }
+        .stMainBlockContainer {
+            padding: 3rem;  
+        }
+        .stMainBlockContainer > div[data-testid="stVerticalBlockBorderWrapper"] .stVerticalBlock:nth-child(1) > .stHorizontalBlock:nth-child(5),
+         .stMainBlockContainer > div[data-testid="stVerticalBlockBorderWrapper"] .stVerticalBlock:nth-child(1) > .stHorizontalBlock:nth-child(7) {
+            margin-left: 5%;
+            margin-right: 5%;
+            margin-bottom: 1rem;
+        }
+        .stMainBlockContainer > div[data-testid="stVerticalBlockBorderWrapper"] .stVerticalBlock:nth-child(1) > .stHorizontalBlock:nth-child(5) > .stColumn:nth-child(1) {
+            min-width:650px;
+        }
+        .stMainBlockContainer > div[data-testid="stVerticalBlockBorderWrapper"] .stVerticalBlock:nth-child(1) > .stHorizontalBlock:nth-child(5) > .stColumn:nth-child(2) {
+            min-width:450px;
+        }
+
+        .stMainBlockContainer > div[data-testid="stVerticalBlockBorderWrapper"] .stVerticalBlock:nth-child(1) > .stHorizontalBlock:nth-child(7),
+         .stMainBlockContainer > div[data-testid="stVerticalBlockBorderWrapper"] .stVerticalBlock:nth-child(1) > .stHorizontalBlock:nth-child(5) > .stColumn:nth-child(1) .stHorizontalBlock {
+            display:flex;
+            flex-direction: column;
+        }
+        .stMainBlockContainer > div[data-testid="stVerticalBlockBorderWrapper"] .stVerticalBlock:nth-child(1) > .stHorizontalBlock:nth-child(5) > .stColumn:nth-child(1) .stHorizontalBlock > .stColumn {
+            width: 100%;
+        }
+        .stMainBlockContainer > div[data-testid="stVerticalBlockBorderWrapper"] .stVerticalBlock:nth-child(1) > .stHorizontalBlock:nth-child(7) > .stColumn,
+         .stMainBlockContainer > div[data-testid="stVerticalBlockBorderWrapper"] .stVerticalBlock:nth-child(1) > .stHorizontalBlock:nth-child(7) > .stColumn:nth-child(2) .stHorizontalBlock > .stColumn {
+            width: 100%;
+            heigth: 90%;
+        }
+        .stMainBlockContainer > div[data-testid="stVerticalBlockBorderWrapper"] .stVerticalBlock:nth-child(1) > .stHorizontalBlock:nth-child(7) > .stColumn:nth-child(1) {
+            width: 10rem;
+        }
+
+        .stMainBlockContainer > div[data-testid="stVerticalBlockBorderWrapper"] .stVerticalBlock:nth-child(1) > .stHorizontalBlock:nth-child(7) > .stColumn:nth-child(2) .stHorizontalBlock {
+            display: flex;
+            flex-direction: column;
+            justify-contet: flex-start;
+        }
+        .stMainBlockContainer > div[data-testid="stVerticalBlockBorderWrapper"] .stVerticalBlock:nth-child(1) > .stHorizontalBlock:nth-child(7) > .stColumn:nth-child(2) .stHorizontalBlock > div:nth-child(1) {
+            order: 2;
+        }
+        .stMainBlockContainer > div[data-testid="stVerticalBlockBorderWrapper"] .stVerticalBlock:nth-child(1) > .stHorizontalBlock:nth-child(7) > .stColumn:nth-child(2) .stHorizontalBlock > div:nth-child(2) {
+            order: 3; 
+        }
+        .stMainBlockContainer > div[data-testid="stVerticalBlockBorderWrapper"] .stVerticalBlock:nth-child(1) > .stHorizontalBlock:nth-child(7) > .stColumn:nth-child(2) .stHorizontalBlock > div:nth-child(3) {
+            order: 1; 
+        }
+
+
+        .stMainBlockContainer > div[data-testid="stVerticalBlockBorderWrapper"] .stVerticalBlock:nth-child(1) > .stHorizontalBlock:nth-child(5) > .stColumn,
+         .stMainBlockContainer > div[data-testid="stVerticalBlockBorderWrapper"] .stVerticalBlock:nth-child(1) > .stHorizontalBlock:nth-child(7) {
+            padding: 1.5rem;
+            border: solid 1px rgba(248, 249, 250, 0.5);
+            border-radius: 10px;    
+            background-color: rgb(248, 249, 250);
+            box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+            transition: box-shadow 0.5s ease-in-out, transform 0.3s ease-in-out;    
+        }
+        .stMainBlockContainer > div[data-testid="stVerticalBlockBorderWrapper"] .stVerticalBlock:nth-child(1) > .stHorizontalBlock:nth-child(5) > .stColumn:hover,
+         .stMainBlockContainer > div[data-testid="stVerticalBlockBorderWrapper"] .stVerticalBlock:nth-child(1) > .stHorizontalBlock:nth-child(7):hover {
+            box-shadow: #0096c7 0px 3px 8px; 
+            transform: translateY(-5px);
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
     @st.cache_data
     def get_data_woj():
         """ Pobiera dane o liczbie ofert pracy z SQL """
@@ -103,9 +184,17 @@ def main():
     fig_woj.update_geos(fitbounds="locations", visible=False)
     fig_woj.update_layout(
         coloraxis_colorbar=dict(
-            x=0.7,  # Przesuwa legendę bliżej mapy (zmniejszaj wartość, jeśli nadal za daleko)
+            x=0.85,  # Przesuwa legendę bliżej mapy (zmniejszaj wartość, jeśli nadal za daleko)
         )
     )
+    fig_woj.update_layout(
+        margin=dict(l=0, r=0, t=0, b=0),  # Usuwa wszystkie marginesy
+        paper_bgcolor='rgb(248, 249, 250)',  # Zmienia kolor całego tła
+        geo=dict(
+            bgcolor='rgb(248, 249, 250)'  # Zmienia kolor samego obszaru mapy
+        )
+    )
+
 
 
     # Odczytanie pliku JSON
@@ -123,8 +212,10 @@ def main():
                         projection="mercator")
     fig_pow.update_geos(fitbounds="locations", visible=False)
     fig_pow.update_layout(
-        coloraxis_colorbar=dict(
-            x=0.7,  # Przesuwa legendę bliżej mapy (zmniejszaj wartość, jeśli nadal za daleko)
+        margin=dict(l=0, r=0, t=0, b=0),  # Usuwa wszystkie marginesy
+        paper_bgcolor='rgb(248, 249, 250)',  # Zmienia kolor całego tła
+        geo=dict(
+            bgcolor='rgb(248, 249, 250)'  # Zmienia kolor samego obszaru mapy
         )
     )
 
@@ -132,97 +223,117 @@ def main():
     cities_cords = pd.read_csv("cities/cities_z_koordynatami.csv")
     df_cities = df_cities.merge(cities_cords, left_on="city_name", right_on='city_name')
     fig_cities = px.scatter_map(df_cities, lat='latitude', lon='longitude', zoom=4, size='liczba_ofert',
-                        color_continuous_scale=px.colors.cyclical.IceFire, size_max=40)
+                        color_continuous_scale=px.colors.cyclical.IceFire, size_max=40,
+                        title="Rozmieszczenie liczby ofert w miastach",
+                        height=500)  # Dodano wysokość wykresu
+    fig_cities.update_layout(
+        margin=dict(l=0, r=0, t=25, b=0),  # Usuwa wszystkie marginesy
+        paper_bgcolor="rgba(0,0,0,0)",  # Usuwa tło wokół mapy
+        plot_bgcolor="rgba(0,0,0,0)",  # Usuwa tło samej mapy
+    )
 
-    st.title("Mapa ofert pracy w Polsce")
+    st.title("Dane na mapie")
 
-    col1, col2= st.columns(2)
+    st.header(f"Rozmieszczenie ofert w Polsce")
+
+    col1, col2= st.columns(2, gap="medium")
     with col1: 
-        selected_chart = st.radio("Wybierz poziom agregacji:", ["Województwa", "Powiaty"], horizontal=True)
-        if selected_chart == "Województwa":
-            st.plotly_chart(fig_woj, use_container_width=True)
-        else:
-            st.plotly_chart(fig_pow, use_container_width=True)
+        col12, col22 = st.columns(2)
+        with col12:
+            selected_chart = st.radio("Wybierz poziom agregacji:", ["Województwa", "Powiaty"], horizontal=True)
+        with col22:
+            if selected_chart == "Województwa":
+                st.plotly_chart(fig_woj, use_container_width=True)
+            else:
+                st.plotly_chart(fig_pow, use_container_width=True)
     with col2:
         st.plotly_chart(fig_cities, use_container_width=True)
     
     
-
+    st.header(f"Sczegółowa mapa ofert w najpopularniejszych miastach")
 
     top5_df = get_data_top5()
 
-    # Wybór miasta
-    cities_options = top5_df["city_name"].unique().tolist()
-
-    # Inicjalizacja session state dla miasta, jeśli nie istnieje
-    if "selected_city" not in st.session_state:
-        st.session_state["selected_city"] = "Warszawa"
-
-    # Widget selectbox z kluczem do automatycznej aktualizacji session_state
-    st.selectbox(
-        "Wybierz miasto", 
-        cities_options, 
-        index=cities_options.index(st.session_state["selected_city"]), 
-        key="selected_city"
-    )
-
-    # Zamiana wartości 0 na NaN
-    top5_df.loc[top5_df["salary"] == 0, "salary"] = np.nan
-
-    # Konwersja wynagrodzenia na liczbę (dla filtrów)
-    top5_df["salary_numeric"] = pd.to_numeric(top5_df["salary"], errors='coerce')
-
-    # Suwak z **stałym zakresem** od 0 do 100 000 PLN
-    salary_range = st.slider(
-        "Zakres wynagrodzenia (PLN)", 
-        0, 100000, (0, 100000)
-    )
-
-    # Filtrowanie po wybranym mieście i zakresie wynagrodzenia
-    filtered_top5_df = top5_df[
-        (top5_df["city_name"] == st.session_state["selected_city"]) & 
-        (top5_df["salary_numeric"].between(salary_range[0], salary_range[1], inclusive="both"))
-    ]
-
-    # Ponowne formatowanie wynagrodzenia
-    filtered_top5_df["salary"] = filtered_top5_df["salary_numeric"].apply(
-        lambda x: f"{x:.2f} PLN" if not pd.isna(x) else "Brak danych"
-    )
-
-    # Tworzenie wykresu
-    fig = px.scatter_mapbox(
-        filtered_top5_df,
-        lat='latitude',
-        lon='longitude',
-        zoom=12,
-        color='field_name',
-        color_continuous_scale=px.colors.cyclical.IceFire,
-        title='Oferty w największych miastach',
-        custom_data=['job_title', 'company_name', 'salary', 'field_name', 'job_offer_name']
-    )
-
-    fig.update_traces(
-        hovertemplate="<b>%{customdata[0]}</b><br>" + 
-                    "<b>Wynagrodzenie:</b> %{customdata[2]}<br>" + 
-                    "<b>Firma:</b> %{customdata[1]}<br>" +
-                    "<b>ID:</b> %{customdata[4]}"
-    )
-
-    fig.update_layout(
-        mapbox_style="carto-positron",
-        height=1000
-    )
-
     # Wyświetlenie wykresu
-    with st.container():
-        st.plotly_chart(fig, use_container_width=True)
+    col1, col2 = st.columns(2)
+    with col1:
+        # Wybór miasta
+        cities_options = top5_df["city_name"].unique().tolist()
 
-        selected_offer = st.selectbox("Wybierz ofertę: ", filtered_top5_df["job_offer_name"].tolist())
-        offer_url = f"https://justjoin.it/job-offer/{selected_offer}"
+        # Inicjalizacja session state dla miasta, jeśli nie istnieje
+        if "selected_city" not in st.session_state:
+            st.session_state["selected_city"] = "Warszawa"
 
+        # Widget selectbox z kluczem do automatycznej aktualizacji session_state
+        st.selectbox(
+            "Wybierz miasto", 
+            cities_options, 
+            index=cities_options.index(st.session_state["selected_city"]), 
+            key="selected_city"
+        )
+    
+    with col2:
+        col21, col22, col23 = st.columns(3)
 
-        st.page_link(offer_url, label="Przejdź do oferty pracy", icon="🌎")
+        with col21:
+            # Zamiana wartości 0 na NaN
+            top5_df.loc[top5_df["salary"] == 0, "salary"] = np.nan
 
+            # Konwersja wynagrodzenia na liczbę (dla filtrów)
+            top5_df["salary_numeric"] = pd.to_numeric(top5_df["salary"], errors='coerce')
 
+            # Suwak z **stałym zakresem** od 0 do 100 000 PLN
+            salary_range = st.slider(
+                "Zakres wynagrodzenia (PLN)", 
+                0, 100000, (0, 100000)
+            )
 
+            # Filtrowanie po wybranym mieście i zakresie wynagrodzenia
+            filtered_top5_df = top5_df[
+                (top5_df["city_name"] == st.session_state["selected_city"]) & 
+                (top5_df["salary_numeric"].between(salary_range[0], salary_range[1], inclusive="both"))
+            ]
 
+            # Ponowne formatowanie wynagrodzenia
+            filtered_top5_df["salary"] = filtered_top5_df["salary_numeric"].apply(
+                lambda x: f"{x:.2f} PLN" if not pd.isna(x) else "Brak danych"
+            )
+        with col22:
+            selected_offer = st.selectbox("Wybierz ofertę za pomocą ID: ", filtered_top5_df["job_offer_name"].tolist())
+            offer_url = f"https://justjoin.it/job-offer/{selected_offer}"
+            st.page_link(offer_url, label="Przejdź do oferty pracy", icon="🌎")
+            
+        
+        with col23:
+            # Tworzenie wykresu
+            fig_cities = px.scatter_mapbox(
+                filtered_top5_df,
+                lat='latitude',
+                lon='longitude',
+                zoom=12,
+                color='field_name',
+                color_continuous_scale=px.colors.cyclical.IceFire,
+                labels={'field_name': 'Dziedzina:'},
+                custom_data=['job_title', 'company_name', 'salary', 'field_name', 'job_offer_name']
+            )
+
+            fig_cities.update_traces(
+                hovertemplate="<b>%{customdata[0]}</b><br>" + 
+                            "<b>Wynagrodzenie:</b> %{customdata[2]}<br>" + 
+                            "<b>Firma:</b> %{customdata[1]}<br>" +
+                            "<b>ID:</b> %{customdata[4]}"
+            )
+
+            fig_cities.update_layout(
+                mapbox_style="carto-positron", #carto-positron #open-street-map
+                height=600
+            )
+            fig_cities.update_layout(
+                margin=dict(l=0, r=0, t=0, b=0),  # Usuwa wszystkie marginesy
+                paper_bgcolor='rgb(248, 249, 250)',  # Zmienia kolor całego tła
+                geo=dict(
+                    bgcolor='rgb(248, 249, 250)'  # Zmienia kolor samego obszaru mapy
+                )
+            )
+            st.plotly_chart(fig_cities, use_container_width=True)
+            
