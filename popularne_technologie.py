@@ -1,9 +1,7 @@
 from sqlalchemy import create_engine, text
-import networkx as nx
 import streamlit as st
 import pandas as pd
 import altair as alt
-import matplotlib.pyplot as plt
 
 server = st.secrets["database"]["DB_SERVER"]
 database = st.secrets["database"]["DB_DATABASE"]
