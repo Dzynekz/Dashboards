@@ -2,7 +2,7 @@ from sqlalchemy import create_engine, text
 from dotenv import load_dotenv
 
 import streamlit as st
-st.set_page_config(layout="wide")
+st.set_page_config(layout="wide", page_title='Analiza Rynku Pracy IT w Polsce')
 import liczba_ofert, zarobki, popularne_technologie, rozklad_pareto, mapa_polski
 
 
