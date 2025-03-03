@@ -250,7 +250,7 @@ def main():
         st.plotly_chart(fig_cities, use_container_width=True)
     
     
-    st.header(f"Sczegółowa mapa ofert w najpopularniejszych miastach")
+    st.header(f"Szczegółowa mapa ofert w najpopularniejszych miastach")
 
     top5_df = get_data_top5()
 
