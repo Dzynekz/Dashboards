@@ -115,6 +115,9 @@ def main():
             min-width:27rem;  
             max-width:60%;    
         }
+        div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(8) > .stColumn:nth-child(2) > * {
+            width: 100%;  
+        }
         
         div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(8) .stColumn:nth-child(2) .stHorizontalBlock > * {
             width: 100%;
