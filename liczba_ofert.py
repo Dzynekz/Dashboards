@@ -67,9 +67,11 @@ def main():
         }
         div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(5) > .stColumn:nth-child(2) {
             min-width:50rem;
+            width: 100%;
         }
         div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(5) > .stColumn:nth-child(2) .stHorizontalBlock {
             display: flex;
+            width: 100%;
         }
         div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(5) > .stColumn:nth-child(2) .stHorizontalBlock .stColumn{
             min-width:50rem;
