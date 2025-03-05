@@ -19,6 +19,9 @@ def main():
     st.markdown(
         """
         <style>
+        body {
+            font-family: 'Arial', sans-serif !important;
+        }
         .main .block-container {
             max-width: 95%;
             padding: 1rem;  
@@ -294,7 +297,6 @@ def main():
 
     col1, col2 = st.columns([0.35,0.65], gap="medium")
     with col1:
-        st.write(st.config.get_option("theme.font"))
         col11, col12 = st.columns(2, gap="medium")
         with col11:
             st.metric(f"### Liczba ofert z ostatniego tygodnia ({selected_experience_levels})", f"{offers_last_week:,}", f"{offers_last_week - offers_ll_week:,}", help='Różnica w porównaniu do poprzedniego tygodnia.')

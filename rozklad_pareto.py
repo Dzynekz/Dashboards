@@ -18,6 +18,9 @@ def main():
     st.markdown(
         """
         <style>
+        body {
+            font-family: 'Arial', sans-serif !important;
+        }
         .main .block-container {
             max-width: 95%;
             padding: 1rem;  
