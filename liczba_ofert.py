@@ -76,9 +76,6 @@ def main():
             display: flex;
             flex-direction: row;
         }
-        
-        
-
 
         div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(8) {
             display: flex;
@@ -184,10 +181,10 @@ def main():
 
     # Dynamiczne metryki
     today = pd.Timestamp.today()
-    offers_last_week = filtered_df[filtered_df["date_full"] >= (today - pd.Timedelta(days=1)) - pd.Timedelta(days=7)]["liczba_ofert"].sum()
+    offers_last_week = filtered_df[filtered_df["date_full"] >= (today - pd.Timedelta(days=1)) - pd.Timedelta(days=6)]["liczba_ofert"].sum()
     offers_ll_week = filtered_df[
-        (filtered_df["date_full"] <= (today - pd.Timedelta(days=1)) - pd.Timedelta(days=7)) &
-        (filtered_df["date_full"] >= (today - pd.Timedelta(days=1)) - pd.Timedelta(days=14))]["liczba_ofert"].sum()
+        (filtered_df["date_full"] <= (today - pd.Timedelta(days=1)) - pd.Timedelta(days=6)) &
+        (filtered_df["date_full"] >= (today - pd.Timedelta(days=1)) - pd.Timedelta(days=13))]["liczba_ofert"].sum()
     offers_last_month = filtered_df[filtered_df["date_full"] >= (today - pd.Timedelta(days=1)) - pd.Timedelta(days=30)]["liczba_ofert"].sum()
     offers_ll_month = filtered_df[
         (filtered_df["date_full"] <= (today - pd.Timedelta(days=1)) - pd.Timedelta(days=30)) &
@@ -205,7 +202,7 @@ def main():
     st.header(f"Liczba ofert na przestrzeni ostatniego czasu")
   
 
-    last_7_days = today - pd.Timedelta(days=8)
+    last_7_days = today - pd.Timedelta(days=7)
 
     week_data = filtered_df[filtered_df["date_full"] >= last_7_days]
     week_data = week_data.groupby(["date_full", "day_name"])["liczba_ofert"].sum().reset_index()
@@ -297,6 +294,7 @@ def main():
 
     col1, col2 = st.columns([0.35,0.65], gap="medium")
     with col1:
+        st.write(st.config.get_option("theme.font"))
         col11, col12 = st.columns(2, gap="medium")
         with col11:
             st.metric(f"### Liczba ofert z ostatniego tygodnia ({selected_experience_levels})", f"{offers_last_week:,}", f"{offers_last_week - offers_ll_week:,}", help='Różnica w porównaniu do poprzedniego tygodnia.')
