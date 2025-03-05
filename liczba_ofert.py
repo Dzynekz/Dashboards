@@ -58,7 +58,6 @@ def main():
         div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(5) > .stColumn:nth-child(1) .stHorizontalBlock {
             display: flex;
             flex-direction: column;
-        
         }
         div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(5) > .stColumn:nth-child(1) .stHorizontalBlock > * {
             width: 100%;
@@ -74,6 +73,7 @@ def main():
         }
         div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(5) > .stColumn:nth-child(2) .stHorizontalBlock .stColumn{
             min-width:50rem;
+            width: 100%;
         }
         div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(5) > .stColumn:nth-child(2) .stHorizontalBlock .stVerticalBlock{
             display: flex;
@@ -99,12 +99,13 @@ def main():
         }
         div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(8) .stColumn:nth-child(1) .stHorizontalBlock .stColumn:nth-child(1) .stVerticalBlock .stElementContainer {
             min-width:10rem;
+            width: 100%;
         }
         div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(8) > .stColumn:nth-child(1) {
             min-width:40rem;
+            width: 100%;
         }
-        
-
+    
         div[data-testid="stVerticalBlock"] div[data-testid="stHorizontalBlock"]:nth-child(8) .stColumn:nth-child(2) .stHorizontalBlock {
             display:flex;
             flex-direction: column;
