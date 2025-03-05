@@ -170,6 +170,8 @@ def main():
         total_offers=('liczba_ofert', 'sum')
     ).reset_index().sort_values('total_offers', ascending=False)
 
+    max_offers = int(df_skill_order['total_offers'].max())
+
     skill_order = df_skill_order['skill_name'].tolist()
     level_order= ['Nice To Have', 'Junior', 'Regular', 'Advanced', 'Master']
 
@@ -177,6 +179,7 @@ def main():
     df_skill_order = top_20_technologies.groupby(['skill_name', 'level_name']).agg(
         total_offers=('liczba_ofert', 'sum')
     ).reset_index()
+
     
     # Create a categorical type for skill_name and level_name with the desired order
     df_skill_order['skill_name'] = pd.Categorical(df_skill_order['skill_name'], categories=skill_order, ordered=True)
@@ -186,7 +189,6 @@ def main():
     df_skill_order = df_skill_order.sort_values(['skill_name', 'level_name'])
     # Calculate cumulative positions for text labels
     df_skill_order['text_position'] = df_skill_order.groupby('skill_name')['total_offers'].cumsum() - (df_skill_order['total_offers'] / 2)
-    #st.dataframe(df_skill_order)
 
     # Tworzenie wykresu z podziałem na poziomy zaawansowania
     bars = alt.Chart(df_skill_order, height=800).mark_bar(cornerRadiusEnd=5).encode(
@@ -195,8 +197,15 @@ def main():
         color=alt.Color('level_name:N', title='Poziom zaawansowania', sort=level_order),
         order=alt.Order('color_level_name_sort_index:Q')
     )
+    
+    
+    threshold = max_offers * 0.009
 
-    text = alt.Chart(df_skill_order).mark_text(align='center',baseline='middle', color='white').encode(
+    text = alt.Chart(df_skill_order).mark_text(
+        align='center', baseline='middle', color='white'
+    ).transform_filter(
+        alt.datum.total_offers >= threshold  # Usuwa wartości poniżej progu
+    ).encode(
         x='text_position',
         y=alt.Y('skill_name:N', sort=skill_order),
         detail='level_name:N',
