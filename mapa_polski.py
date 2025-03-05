@@ -33,6 +33,18 @@ def main():
         .stMainBlockContainer {
             padding: 3rem;  
         }
+        [data-testid="stPageLink-NavLink"] {
+            border: 2px solid rgba(49, 51, 63, 0.2);
+            border-radius: 10px;    
+            background-color: rgb(255, 255, 255);
+            transition: border-color 0.3s ease, transform 0.3s ease-in-out; 
+        }
+        [data-testid="stPageLink-NavLink"]:hover {
+            border-color: #0096c7;
+            background-color: rgb(255, 255, 255);
+            color: #0096c7;
+            transform: translateY(-5px);
+        }
         .stMainBlockContainer > div[data-testid="stVerticalBlockBorderWrapper"] .stVerticalBlock:nth-child(1) > .stHorizontalBlock:nth-child(5),
          .stMainBlockContainer > div[data-testid="stVerticalBlockBorderWrapper"] .stVerticalBlock:nth-child(1) > .stHorizontalBlock:nth-child(7) {
             margin-left: 5%;
@@ -77,7 +89,6 @@ def main():
         .stMainBlockContainer > div[data-testid="stVerticalBlockBorderWrapper"] .stVerticalBlock:nth-child(1) > .stHorizontalBlock:nth-child(7) > .stColumn:nth-child(2) .stHorizontalBlock > div:nth-child(3) {
             order: 1; 
         }
-
 
         .stMainBlockContainer > div[data-testid="stVerticalBlockBorderWrapper"] .stVerticalBlock:nth-child(1) > .stHorizontalBlock:nth-child(5) > .stColumn,
          .stMainBlockContainer > div[data-testid="stVerticalBlockBorderWrapper"] .stVerticalBlock:nth-child(1) > .stHorizontalBlock:nth-child(7) {
@@ -301,7 +312,7 @@ def main():
         with col22:
             selected_offer = st.selectbox("Wybierz ofertę za pomocą ID: ", filtered_top5_df["job_offer_name"].tolist())
             offer_url = f"https://justjoin.it/job-offer/{selected_offer}"
-            st.page_link(offer_url, label="Przejdź do oferty pracy", icon="🌎")
+            st.page_link(offer_url, label="Przejdź do oferty pracy")
             
         
         with col23:
