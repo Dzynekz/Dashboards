@@ -319,35 +319,51 @@ def main():
             
         
         with col23:
-            # Tworzenie wykresu
-            fig_cities = px.scatter_mapbox(
-                filtered_top5_df,
-                lat='latitude',
-                lon='longitude',
-                zoom=12,
-                color='field_name',
-                color_continuous_scale=px.colors.cyclical.IceFire,
-                labels={'field_name': 'Dziedzina:'},
-                custom_data=['job_title', 'company_name', 'salary', 'field_name', 'job_offer_name']
-            )
-
-            fig_cities.update_traces(
-                hovertemplate="<b>%{customdata[0]}</b><br>" + 
-                            "<b>Wynagrodzenie:</b> %{customdata[2]}<br>" + 
-                            "<b>Firma:</b> %{customdata[1]}<br>" +
-                            "<b>ID:</b> %{customdata[4]}"
-            )
-
-            fig_cities.update_layout(
-                mapbox_style="carto-positron", #carto-positron #open-street-map
-                height=600
-            )
-            fig_cities.update_layout(
-                margin=dict(l=0, r=0, t=0, b=0),  # Usuwa wszystkie marginesy
-                paper_bgcolor='rgb(248, 249, 250)',  # Zmienia kolor całego tła
-                geo=dict(
-                    bgcolor='rgb(248, 249, 250)'  # Zmienia kolor samego obszaru mapy
+            if not filtered_top5_df.empty:
+                # Tworzenie wykresu, jeśli istnieją oferty
+                fig_cities = px.scatter_mapbox(
+                    filtered_top5_df,
+                    lat='latitude',
+                    lon='longitude',
+                    zoom=12,
+                    color='field_name',
+                    color_continuous_scale=px.colors.cyclical.IceFire,
+                    labels={'field_name': 'Dziedzina:'},
+                    custom_data=['job_title', 'company_name', 'salary', 'field_name', 'job_offer_name']
                 )
+
+                fig_cities.update_traces(
+                    hovertemplate="<b>%{customdata[0]}</b><br>" + 
+                                "<b>Wynagrodzenie:</b> %{customdata[2]}<br>" + 
+                                "<b>Firma:</b> %{customdata[1]}<br>" +
+                                "<b>ID:</b> %{customdata[4]}"
+                )
+            else:
+                # Jeśli brak ofert, pobierz współrzędne miasta i nie dodawaj punktów
+                city_coords = top5_df[top5_df["city_name"] == st.session_state["selected_city"]][["latitude", "longitude"]].mean()
+
+                fig_cities = px.scatter_mapbox(
+                    pd.DataFrame(columns=['latitude', 'longitude']),  # Pusty DataFrame
+                    lat='latitude',
+                    lon='longitude',
+                    zoom=12
+                )
+
+                # Ustawienie widoku na miasto
+                fig_cities.update_layout(
+                    mapbox_center={"lat": city_coords["latitude"], "lon": city_coords["longitude"]}
+                )
+
+            # Ustawienia wyglądu mapy
+            fig_cities.update_layout(
+                mapbox_style="carto-positron",
+                height=600,
+                margin=dict(l=0, r=0, t=0, b=0),
+                paper_bgcolor='rgb(248, 249, 250)',
+                geo=dict(bgcolor='rgb(248, 249, 250)')
             )
+            
             st.plotly_chart(fig_cities, use_container_width=True)
+
+
             
