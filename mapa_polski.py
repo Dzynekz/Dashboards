@@ -7,6 +7,7 @@ import numpy as np
 import webbrowser
 from sqlalchemy import create_engine
 from streamlit.components.v1 import html
+from datetime import datetime, timedelta
 
 # 🔹 Połączenie z bazą danych
 server = st.secrets["database"]["DB_SERVER"]
@@ -158,23 +159,26 @@ def main():
     def get_data_top5():
         with engine.connect() as connection:
             df = pd.read_sql('''
-                SELECT jo.job_offer_id, jo.job_title, jo.job_offer_name, f.field_name, jo.latitude, jo.longitude, d.date_full, c.city_name, co.company_name,
-                        ((COALESCE(s.salary_from, 0) + COALESCE(s.salary_to, 0)) / 2) as salary
+                SELECT jo.job_offer_id, jo.job_title, jo.job_offer_name, f.field_name, jo.latitude, jo.longitude, d.date_full, 
+                    c.city_name, co.company_name, et.employment_type_name, ((COALESCE(s.salary_from, 0) + COALESCE(s.salary_to, 0)) / 2) as salary
                 FROM Job_Offers as jo JOIN Cities as c on jo.city_id=c.city_id
                 JOIN Dates as d on jo.date_id=d.date_id
                 JOIN Fields as f on jo.field_id=f.field_id
                 JOIN Job_Offers_Salaries as jos on jos.job_offer_id=jo.job_offer_id
                 JOIN Salaries as s on jos.salary_id=s.salary_id
                 JOIN Companies as co on jo.company_id=co.company_id
+				JOIN Employment_Types as et on jos.employment_type_id=et.employment_type_id
                 WHERE (city_name = 'Warszawa' OR city_name = 'Wrocław' OR city_name = 'Kraków' OR city_name = 'Gdańsk' OR city_name = 'Poznań') 
-                        AND (jo.latitude is not NULL) AND (jo.latitude is not NULL)
+                    AND (jo.latitude is not NULL) AND (jo.latitude is not NULL)
             ''', connection)
+        df["date_full"] = pd.to_datetime(df["date_full"])
         return df
     
 
     df_woj = get_data_woj()
-
     df_pow = get_data_pow()
+
+
     def format_values(val):
         val1, val2 = val.split("_")  # Rozdzielamy wartości
         val1 = str(val1) if int(val1) >= 10 else '0' + str(val1)
@@ -226,10 +230,15 @@ def main():
                         projection="mercator")
     fig_pow.update_geos(fitbounds="locations", visible=False)
     fig_pow.update_layout(
+        coloraxis_colorbar=dict(
+            x=0.85,  # Przesuwa legendę bliżej mapy (zmniejszaj wartość, jeśli nadal za daleko)
+        )
+    )
+    fig_pow.update_layout(
         margin=dict(l=0, r=0, t=0, b=0),  # Usuwa wszystkie marginesy
         paper_bgcolor='rgb(248, 249, 250)',  # Zmienia kolor całego tła
         geo=dict(
-            bgcolor='rgb(248, 249, 250)'  # Zmienia kolor samego obszaru mapy
+            bgcolor= 'rgb(248, 249, 250)'  # Zmienia kolor samego obszaru mapy
         )
     )
 
@@ -239,9 +248,9 @@ def main():
     fig_cities = px.scatter_map(df_cities, lat='latitude', lon='longitude', zoom=4, size='liczba_ofert',
                         color_continuous_scale=px.colors.cyclical.IceFire, size_max=40,
                         title="Rozmieszczenie liczby ofert w miastach",
-                        height=500)  # Dodano wysokość wykresu
+                        height=500) 
     fig_cities.update_layout(
-        margin=dict(l=0, r=0, t=25, b=0),  # Usuwa wszystkie marginesy
+        margin=dict(l=0, r=0, t=25, b=0),
         paper_bgcolor="rgba(0,0,0,0)",  # Usuwa tło wokół mapy
         plot_bgcolor="rgba(0,0,0,0)",  # Usuwa tło samej mapy
     )
@@ -302,11 +311,12 @@ def main():
                 0, 100000, (0, 100000)
             )
 
-            # Filtrowanie po wybranym mieście i zakresie wynagrodzenia
+
             filtered_top5_df = top5_df[
                 (top5_df["city_name"] == st.session_state["selected_city"]) & 
                 (top5_df["salary_numeric"].between(salary_range[0], salary_range[1], inclusive="both"))
             ]
+            
 
             # Ponowne formatowanie wynagrodzenia
             filtered_top5_df["salary"] = filtered_top5_df["salary_numeric"].apply(
@@ -329,13 +339,15 @@ def main():
                     color='field_name',
                     color_continuous_scale=px.colors.cyclical.IceFire,
                     labels={'field_name': 'Dziedzina:'},
-                    custom_data=['job_title', 'company_name', 'salary', 'field_name', 'job_offer_name']
+                    custom_data=['job_title', 'company_name', 'salary', 'field_name', 'job_offer_name', 'date_full', 'employment_type_name']
                 )
 
                 fig_cities.update_traces(
                     hovertemplate="<b>%{customdata[0]}</b><br>" + 
                                 "<b>Wynagrodzenie:</b> %{customdata[2]}<br>" + 
+                                "<b>Umowa:</b> %{customdata[6]}<br>" +
                                 "<b>Firma:</b> %{customdata[1]}<br>" +
+                                "<b>Data:</b> %{customdata[5]}<br>" +
                                 "<b>ID:</b> %{customdata[4]}"
                 )
             else:
