@@ -81,6 +81,10 @@ def main():
             margin-right: 5%;
         }
 
+        .stHorizontalBlock:nth-child(5) > .stColumn:nth-child(1) .stVerticalBlock > .stElementContainer  {
+            width: 100%;
+        }
+
         .stExpander {
             width: 100%;
         }
