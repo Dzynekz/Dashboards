@@ -222,26 +222,26 @@ def main():
     week_data = week_data.sort_values("date_full")
     
     ############################################
-    # 🔹 Wykres słupkowy
+    # Wykres słupkowy
     bars = alt.Chart(week_data).mark_bar(size=30, color='#0096c7').encode(
         x=alt.X("date_full:T", title="Data", axis=alt.Axis(labelAngle=-45), sort=None),
         y=alt.Y("liczba_ofert:Q", title="Liczba ofert")
     )
 
-    # 🔹 Etykiety nad słupkami
+    # Etykiety
     labels = alt.Chart(week_data).mark_text(
         align="center",
         baseline="bottom",
-        dy=-5,  # 🔹 Przesunięcie tekstu nad słupkiem
+        dy=-5, 
         fontSize=12,
         fontWeight="bold"
     ).encode(
         x=alt.X("date_full:T"),
         y=alt.Y("liczba_ofert:Q"),
-        text=alt.Text("liczba_ofert:Q", format=",d")  # 🔹 Formatowanie liczb (tysiące z przecinkiem)
+        text=alt.Text("liczba_ofert:Q", format=",d") 
     )
 
-    # 🔹 Połączenie wykresu słupkowego i etykiet
+    # Połączenie wykresu słupkowego i etykiet
     weekly_chart = (bars + labels).properties(
         title="Liczba ofert w ostatnich 7 dniach"
     ).configure(
@@ -258,9 +258,7 @@ def main():
     # Grupowanie danych dla skumulowanego wykresu
     stacked_data = month_data.groupby(["date_full", "experience_level"])["liczba_ofert"].sum().reset_index()
 
-    # Warstwa podświetlenia weekendów
-
-    # Wykres słupkowy (stacked bar chart)
+    # Wykres słupkowy
     stacked_chart = alt.Chart(stacked_data).mark_bar(size=15).encode(
         x=alt.X("date_full:T", title="Data", axis=alt.Axis(labelAngle=-45)),  # Oś X - data
         y=alt.Y("liczba_ofert:Q", title="Liczba ofert"),  # Oś Y - łączna liczba ofert
@@ -271,10 +269,10 @@ def main():
     ).configure(
         background='rgb(248, 249, 250)'  # Tło wykresu
     )
+
     stacked_chart = stacked_chart.configure_title(
         fontSize=20
     )
-
 
     experience_data = filtered_df.groupby("experience_level")["liczba_ofert"].sum().reset_index()
     experience_data_nf = df.groupby("experience_level")["liczba_ofert"].sum().reset_index().sort_values(
@@ -284,15 +282,15 @@ def main():
 
     # Podstawowy wykres kołowy
     base = alt.Chart(experience_data).encode(
-        theta=alt.Theta("liczba_ofert:Q").stack(True),  # Stosowanie wartości
+        theta=alt.Theta("liczba_ofert:Q").stack(True),
         color=alt.Color("experience_level:N", legend=None)
     )
 
     # Warstwa pie chart
     pie = base.mark_arc(outerRadius=120, innerRadius=50)
 
-    # Warstwa etykiet (umieszczonych na zewnątrz)
-    text = base.mark_text(radius=140, size=14, fontWeight="bold").encode(
+    # Warstwa etykiet
+    text = base.mark_text(radius=150, size=14, fontWeight="bold").encode(
         text=alt.Text("experience_level:N")
     )
 
@@ -309,14 +307,17 @@ def main():
     with col1:
         col11, col12 = st.columns(2, gap="medium")
         with col11:
-            st.metric(f"### Liczba ofert z ostatniego tygodnia ({selected_experience_levels})", f"{offers_last_week:,}", f"{offers_last_week - offers_ll_week:,}", help='Różnica w porównaniu do poprzedniego tygodnia.')
+            st.metric(f"### Liczba ofert z ostatniego tygodnia ({selected_experience_levels})", f"{offers_last_week:,}", 
+                      f"{offers_last_week - offers_ll_week:,}", help='Różnica w porównaniu do poprzedniego tygodnia.')
         with col12:
             st.altair_chart(weekly_chart, use_container_width=True)
     with col2:
         col21, col22 = st.columns([1,1], gap='medium')
         with col21:
-            st.metric(f"### Liczba ofert z ostatniego miesiąca ({selected_experience_levels})", f"{offers_last_month:,}", f"{offers_last_month - offers_ll_month:,}", help='Różnica w porównaniu do poprzedniego miesiąca.')
-            st.metric(f"### Liczba ofert z ostatniego roku ({selected_experience_levels})", f"{offers_last_year:,}", f"{offers_last_year - offers_ll_year:,}", help='Różnica w porównaniu do poprzedniego roku.')
+            st.metric(f"### Liczba ofert z ostatniego miesiąca ({selected_experience_levels})", f"{offers_last_month:,}",
+                       f"{offers_last_month - offers_ll_month:,}", help='Różnica w porównaniu do poprzedniego miesiąca.')
+            st.metric(f"### Liczba ofert z ostatniego roku ({selected_experience_levels})", f"{offers_last_year:,}",
+                       f"{offers_last_year - offers_ll_year:,}", help='Różnica w porównaniu do poprzedniego roku.')
         with col22:     
             st.altair_chart(stacked_chart, use_container_width=True) 
 
@@ -325,22 +326,22 @@ def main():
     st.markdown("---")  # Dodaj linię oddzielającą
     st.header("Liczba ofert na przestrzeni lat")
     
-    # 🔹 Tworzenie kolumny "year_month" (np. "2023-01")
-    filtered_df = filtered_df.copy()  # Tworzy bezpieczną kopię, eliminując warning
+    # Tworzenie kolumny "year_month" (np. "2023-01")
+    filtered_df = filtered_df.copy()
     filtered_df.loc[:, "year_month"] = filtered_df["date_full"].dt.to_period("M").astype(str)
 
-    # 🔹 Grupowanie danych miesięcznie zamiast rocznie
+    # Grupowanie danych miesięcznie zamiast rocznie
     monthly_data = filtered_df.groupby(["year_month", "experience_level"])["liczba_ofert"].sum().reset_index()
 
 
-    # 🔹 Tworzenie wykresu z ukrytą legendą
+    # Tworzenie wykresu
     base = alt.Chart(monthly_data).encode(
         alt.Color("experience_level:N", title="Poziom Doświadczenia")  # Dodanie tytułu legendy
     ).properties(
         width=600
     )
 
-    # 🔹 Wykres warstwowy zamiast liniowego
+    # Obszar
     area = base.mark_area(opacity=0.6).encode(
         x=alt.X("year_month:T", title="Miesiąc", axis=alt.Axis(labelAngle=-45)),
         y=alt.Y("liczba_ofert:Q", title="Liczba ofert"),
