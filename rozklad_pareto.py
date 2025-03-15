@@ -307,9 +307,9 @@ def main():
             )
 
             qq_chart = qq_chart.configure(
-                background='rgb(248, 249, 250)'  # Tło wykresu
+                background='rgb(248, 249, 250)'
             ).properties(
-                title="Wykres Q-Q (log-log)"
+                title="Analiza dopasowania rozkładu Pareto"
             ).configure_title(
                 fontSize=20
             )
