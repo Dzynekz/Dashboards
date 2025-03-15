@@ -57,6 +57,10 @@ def main():
             display:flex;
             flex-direction: row;
         }
+
+        .stVerticalBlock > .stHorizontalBlock:nth-child(4) > .stColumn:nth-child(2) .stHorizontalBlock > .stColumn:nth-child(1) .stVerticalBlock > .stElementContainer {
+            width: 100%;
+        }
         .stMetric {
             width: 100%;
         }
