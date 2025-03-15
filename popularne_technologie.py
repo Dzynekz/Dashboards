@@ -2,6 +2,7 @@ from sqlalchemy import create_engine, text
 import streamlit as st
 import pandas as pd
 import altair as alt
+from datetime import datetime, timedelta
 
 server = st.secrets["database"]["DB_SERVER"]
 database = st.secrets["database"]["DB_DATABASE"]
@@ -133,6 +134,23 @@ def main():
 
     st.session_state["selected_skill_levels"] = selected_skill_levels
 
+    # Sidebar - wybór zakresu daty
+    st.sidebar.title("Wybierz zakres daty")
+
+    date_range_options = {
+        "Cały okres": None,
+        "Ostatnie 3 miesiące": datetime.today() - timedelta(days=90),
+        "Ostatni rok": datetime.today() - timedelta(days=365)
+    }
+
+    if "selected_date_range" not in st.session_state:
+        st.session_state["selected_date_range"] = "Cały okres"
+
+    # Wybór zakresu
+    selected_date_range = st.sidebar.selectbox("Zakres dat:", list(date_range_options.keys()), 
+                                            index=list(date_range_options.keys()).index(st.session_state["selected_date_range"]))
+
+    st.session_state["selected_date_range"] = selected_date_range
 
 
 
@@ -150,14 +168,31 @@ def main():
             selected_fields = fields_options
 
     # Filtrowanie danych
-    filtered_df = df[(df["experience_level_name"].isin(st.session_state["selected_levels"])) &
-                     (df["level_name"].isin(st.session_state["selected_skill_levels"])) &
-                     (df["field_name"].isin(selected_fields))]
+    if date_range_options[selected_date_range]:  # Jeśli wybrano "ostatnie 3 miesiące" lub "ostatni rok"
+        start_date = date_range_options[selected_date_range]
+        filtered_df = df[
+            (df["experience_level_name"].isin(st.session_state["selected_levels"])) &
+            (df["level_name"].isin(st.session_state["selected_skill_levels"])) &
+            (df["field_name"].isin(selected_fields)) &
+            (df["date_full"] >= start_date)
+        ]
+        filtered_df2 = df2[
+            (df2["experience_level_name"].isin(st.session_state["selected_levels"])) &
+            (df2["field_name"].isin(selected_fields)) &
+            (df2["date_full"] >= start_date)
+        ]
+    else:  # Jeśli wybrano "Cały okres", nie stosujemy filtra daty
+        filtered_df = df[
+            (df["experience_level_name"].isin(st.session_state["selected_levels"])) &
+            (df["level_name"].isin(st.session_state["selected_skill_levels"])) &
+            (df["field_name"].isin(selected_fields))
+        ]
+        filtered_df2 = df2[
+            (df2["experience_level_name"].isin(st.session_state["selected_levels"])) &
+            (df2["field_name"].isin(selected_fields))
+        ]
     
-    filtered_df2 = df2[(df2["experience_level_name"].isin(st.session_state["selected_levels"])) &
-                     (df2["field_name"].isin(selected_fields))]
-    
-    offers = filtered_df2["liczba_ofert"].sum()
+    offers = filtered_df2["liczba_ofert"].sum() if not filtered_df2.empty else 0
 
     # Grupowanie danych i wybór top 20 technologii ogólnie
     top_20_skills = (filtered_df.groupby("skill_name")
@@ -202,7 +237,7 @@ def main():
     )
     
     
-    threshold = max_offers * 0.009
+    threshold = max_offers * 0.025
 
     text = alt.Chart(df_skill_order).mark_text(
         align='center', baseline='middle', color='white'
