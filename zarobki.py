@@ -57,7 +57,9 @@ def main():
             display:flex;
             flex-direction: row;
         }
-
+        .stMetric {
+            width: 100%;
+        }
         .stMetric,
          .stVerticalBlock > .stHorizontalBlock:nth-child(4) > .stColumn {
             padding: 1.5rem;
