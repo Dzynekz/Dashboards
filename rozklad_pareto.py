@@ -234,7 +234,7 @@ def main():
 
     # Wyświetlenie wykresu
     with col2:
-        col21, col22 = st.columns(2)
+        col21, col22 = st.columns([1.6,1])
         with col21:
             st.altair_chart(chart_top10, use_container_width=True)
         with col22:
