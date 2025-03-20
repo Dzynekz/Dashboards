@@ -103,6 +103,7 @@ def main():
                 LEFT JOIN Skills sk ON josk.skill_id = sk.skill_id
             WHERE e.employment_type_id IN (1,2,7,6,5,4,3,20,18,25) 
                 AND (salary_from is NULL OR (salary_from < 200000 AND salary_to < 200000))
+                AND ((salary_from is NULL OR (salary_from > 1000 AND salary_to > 1000)) AND salary_currency = 'PLN')
             GROUP BY j.job_offer_id, f.field_name, el.experience_level_name, om.operating_mode_name, 
                     s.salary_from, s.salary_to, s.salary_currency, e.employment_type_name, c.city_name
         '''
@@ -168,7 +169,7 @@ def main():
             df = pd.read_sql(query, connection)
         return df["skill_name"].tolist()
 
-     # **Normalizacja typów umowy**
+     # Normalizacja typów umowy
     
     employment_mapping = {
         "B2B": "B2B",
@@ -213,7 +214,7 @@ def main():
     # Tytuł dashboardu
     st.title("Dashboard Zarobków IT: Filtruj i Analizuj Oferty")
 
-    # **Filtry**
+    # Filtry
 
     col1, col2 = st.columns([1,4], gap="medium")
 
@@ -250,18 +251,18 @@ def main():
             skills_list.insert(0, "Wybierz umiejętność...")  # Placeholder
             
 
-            # **Inicjalizacja session_state dla umiejętności**
+            # Inicjalizacja session_state dla umiejętności
             if "selected_skills" not in st.session_state:
                 st.session_state.selected_skills = []
 
-            # **Limit wyboru umiejętności**
+            # Limit wyboru umiejętności
             MAX_SKILLS = 5
 
-            # **Wybór umiejętności tylko jeśli limit nie został przekroczony**
+            # Wybór umiejętności tylko jeśli limit nie został przekroczony
             if len(st.session_state.selected_skills) < MAX_SKILLS:
                 selected_skill = st.selectbox("🛠 Wybierz umiejętności (max 5):", skills_list, key='skill_selection')
 
-                # **Dodanie umiejętności do listy, jeśli nie jest placeholderem i nie została już wybrana**
+                # Dodanie umiejętności do listy, jeśli nie jest placeholderem i nie została już wybrana
                 if selected_skill and selected_skill != "Wybierz umiejętność..." and selected_skill not in st.session_state.selected_skills:
                     st.session_state.selected_skills.append(selected_skill)
                     st.rerun()  # Odświeżenie UI po dodaniu nowej umiejętności
@@ -269,22 +270,21 @@ def main():
             def reset_skill_choose():
                 st.session_state.skill_selection = 'Wybierz umiejętność...'
 
-            # **Stylizacja wybranych umiejętności**
             st.write("#### Wybrane umiejętności:")
 
-            # **Obsługa usuwania umiejętności**
+            # Obsługa usuwania umiejętności
             skill_to_remove = None
 
             for skill in st.session_state.selected_skills:
                 if st.button(f"❌ {skill}", key=f"remove_{skill}", on_click=reset_skill_choose):
                     skill_to_remove = skill  # Zapisujemy umiejętność do usunięcia
 
-            # **Usunięcie umiejętności po pętli**
+            # Usunięcie umiejętności po pętli
             if skill_to_remove:
                 st.session_state.selected_skills.remove(skill_to_remove)
                 st.rerun()  # Odświeżenie UI po usunięciu umiejętności
 
-    # **Filtrowanie danych według wybranych filtrów**
+    # Filtrowanie danych według wybranych filtrów
     filtered_offers = job_offers.copy()
 
     if selected_field != "Wybierz dziedzinę...":
@@ -295,12 +295,12 @@ def main():
         filtered_offers = filtered_offers[filtered_offers["experience_level_name"] == selected_experience]
     if selected_cities != "Wybierz miasto...":
         filtered_offers = filtered_offers[filtered_offers["city_name"] == selected_cities]
-    # **Filtrowanie po umiejętnościach**
+    # Filtrowanie po umiejętnościach
     if st.session_state.selected_skills:
         for skill in st.session_state.selected_skills:
             filtered_offers = filtered_offers[filtered_offers["skills"].apply(lambda x: skill in x)]
 
-    # **Obliczenie średnich zarobków dla każdego typu umowy**
+    # Obliczenie średnich zarobków dla każdego typu umowy
     salary_means = (
         filtered_offers.groupby("employment_type_name")
         .agg({"salary_from": "mean", "salary_to": "mean"})
@@ -320,14 +320,14 @@ def main():
             
         else:
 
-            # **Obliczenie liczby ofert dla każdego typu umowy**
+            # Obliczenie liczby ofert dla każdego typu umowy
             employment_counts = filtered_offers["employment_type_name"].value_counts().reset_index()
             employment_counts.columns = ["Typ umowy", "Liczba ofert"]
 
             employment_counts = employment_counts.sort_values(by="Typ umowy")
 
             with col21:
-                # **Wyświetlenie liczby ofert dla każdego typu umowy**
+                # Wyświetlenie liczby ofert dla każdego typu umowy
                 for index, row in employment_counts.iterrows():
                     st.metric(label=row["Typ umowy"], value=row["Liczba ofert"])
             
@@ -343,22 +343,23 @@ def main():
             average_salaries["Salary Type"] = "Średnia"
 
             # Połączenie przekształconych danych
-            final_data = pd.concat([long_salaries, average_salaries])
+            final_data = pd.concat([long_salaries, average_salaries]).reset_index(drop=True)
+            final_data = final_data.rename(columns={"employment_type_name": "Typ umowy"})
+
 
             with col22:
                 st.write("### Oferty pasujące do wymagań:")
 
             with col23:
+                
                 # Wykres pudełkowy
                 box_plot = alt.Chart(final_data).mark_boxplot(size=150, extent="min-max").encode(
-                    x=alt.X("employment_type_name:N", title="Typ umowy"),
+                    x=alt.X("Typ umowy:N", title="Typ umowy", axis=alt.Axis(labelAngle=0)),
                     y=alt.Y("Salary:Q", title="Zarobki"),
-                    color=alt.Color("employment_type_name:N", legend=None),
-                    tooltip=["employment_type_name", "Salary"]
+                    color=alt.Color("Typ umowy:N", legend=None),
                 ).properties(
-                    height=700
+                    height=500
                 )
-
                 box_plot = box_plot.configure(
                     background='rgb(248, 249, 250)'
                 ).properties(
